@@ -25,4 +25,12 @@ public class TranscriptionProfile
 
     /// <summary>BCP-47 language code passed to the transcription service (e.g. "fr", "en-US").</summary>
     public string Language { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Backend-specific parameters that don't fit the common fields above.
+    /// Examples: deployment name, model size for local Whisper, project ID for Google Speech.
+    /// Read by the adapter via <c>ExtraParameters.GetValueOrDefault("key")</c>.
+    /// Empty by default — unused in v1 (Azure OpenAI only).
+    /// </summary>
+    public Dictionary<string, string> ExtraParameters { get; set; } = [];
 }
