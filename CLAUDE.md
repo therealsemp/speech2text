@@ -1,4 +1,4 @@
-# CLAUDE.md — Référence projet text2speech
+# CLAUDE.md — Référence projet speech2text
 
 ## Fichiers de référence
 - **Specs fonctionnelles** : `docs/specs.md`
@@ -8,7 +8,7 @@
 > Consulter ces fichiers avant toute implémentation.
 
 ## Stack
-C# 13 / .NET 9 — WPF — self-contained exe
+C# 13 / .NET 10 — WPF — self-contained exe
 
 ## Statut du projet
 Phase : **Prêt pour le développement**

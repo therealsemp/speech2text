@@ -1,4 +1,4 @@
-# text2speech
+# speech2text
 
 A lightweight Windows dictation app that replaces the native Win+H shortcut with AI-powered transcription.
 

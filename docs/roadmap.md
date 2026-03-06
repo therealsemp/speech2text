@@ -3,7 +3,7 @@
 ## Phase 1 — Bootstrap
 > Project skeleton, everything builds and CI runs
 
-- [ ] Create WPF solution + test project (`text2speech` / `text2speech.Tests`)
+- [ ] Create WPF solution + test project (`speech2text` / `speech2text.Tests`)
 - [ ] Set up folder structure (Domain, Application, Adapters, UI)
 - [ ] Add NuGet packages (NAudio, Azure.AI.OpenAI, NHotkey.Wpf, InputSimulatorStandard, Moq, xUnit)
 - [ ] GitHub Actions `ci.yml` (push to develop/main → restore + build + test)
@@ -34,7 +34,7 @@
 - [ ] `NAudioCaptureAdapter` — microphone recording, device selection
 - [ ] `AzureOpenAITranscriptionAdapter` — Whisper API call
 - [ ] `SendInputTextAdapter` — text injection at cursor
-- [ ] `JsonSettingsRepository` — load/save `%AppData%\text2speech\settings.json`
+- [ ] `JsonSettingsRepository` — load/save `%AppData%\speech2text\settings.json`
 - [ ] `NHotkeyAdapter` — global hotkey registration (`Ctrl+Shift+R` default)
 
 ## Phase 5 — UI

@@ -1,7 +1,7 @@
 # Technical Architecture
 
 ## Stack
-- **Language**: C# 13 / .NET 9
+- **Language**: C# 13 / .NET 10
 - **UI framework**: WPF (Windows Presentation Foundation) — Windows-only, native
 - **Deployment**: self-contained single `.exe` (no .NET runtime required on target machine)
 - **Architecture pattern**: Hexagonal (Ports & Adapters) + MVVM for the UI layer
@@ -131,7 +131,7 @@ public class TranscriptionBackendFactory : ITranscriptionBackendFactory
 ## Project structure
 
 ```
-text2speech/
+speech2text/
   Domain/
     RecordingSession.cs           # Aggregate — session lifecycle + domain events
     TranscriptionProfile.cs       # Entity — named service configuration
@@ -179,7 +179,7 @@ text2speech/
 
 - **Framework**: xUnit
 - **Mocking**: Moq (for injecting fake port implementations)
-- **Separate test project**: `text2speech.Tests/`
+- **Separate test project**: `speech2text.Tests/`
 
 ### What is tested
 
@@ -193,7 +193,7 @@ text2speech/
 ### Test project structure
 
 ```
-text2speech.Tests/
+speech2text.Tests/
   Domain/
     RecordingSessionTests.cs
     TranscriptionProfileTests.cs
@@ -206,7 +206,7 @@ text2speech.Tests/
 ---
 
 ## Configuration storage
-- JSON file at `%AppData%\text2speech\settings.json`
+- JSON file at `%AppData%\speech2text\settings.json`
 - Contains: list of profiles, active profile ID, selected audio device, hotkey binding
 
 ## CI/CD — GitHub Actions
@@ -238,5 +238,5 @@ Workflow files to be created when bootstrapping the project.
 
 ## Technical constraints
 - Windows only (WPF, NAudio, SendInput)
-- .NET 9 required at build time (VS Code + C# Dev Kit extension)
+- .NET 10 required at build time (VS Code + C# Dev Kit extension)
 - Target: self-contained x64 executable
