@@ -90,15 +90,15 @@
             <StackPanel Margin="14,12,14,14">
 
                 <!-- Horizontal controls row -->
-                <Grid>
+                <Grid Grid.IsSharedSizeScope="True">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>  <!-- Record FAB -->
+                        <ColumnDefinition Width="Auto"/>                            <!-- Record FAB -->
                         <ColumnDefinition Width="16"/>
-                        <ColumnDefinition Width="*"/>     <!-- Connector -->
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="Selector"/> <!-- Connector -->
                         <ColumnDefinition Width="12"/>
-                        <ColumnDefinition Width="*"/>     <!-- Microphone -->
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="Selector"/> <!-- Microphone -->
                         <ColumnDefinition Width="10"/>
-                        <ColumnDefinition Width="Auto"/>  <!-- Settings -->
+                        <ColumnDefinition Width="Auto"/>                            <!-- Settings -->
                     </Grid.ColumnDefinitions>
 
                     <!-- Round record button -->
