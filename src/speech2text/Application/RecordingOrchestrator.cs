@@ -15,11 +15,17 @@ public class RecordingOrchestrator(
 
     public RecordingState State => _session.State;
 
+    /// <summary>Fired on the calling thread after each state transition.</summary>
+    public event Action<RecordingState>? StateChanged;
+
+    private void NotifyStateChanged() => StateChanged?.Invoke(_session.State);
+
     public async Task StartRecordingAsync()
     {
         _cts = new CancellationTokenSource();
         _cancelled = false;
         _session.StartRecording();
+        NotifyStateChanged();
 
         byte[] audio;
         try
@@ -29,16 +35,19 @@ public class RecordingOrchestrator(
         catch (OperationCanceledException)
         {
             _session.Cancel();
+            NotifyStateChanged();
             return;
         }
 
         if (_cancelled)
         {
             _session.Cancel();
+            NotifyStateChanged();
             return;
         }
 
         _session.StopRecording();
+        NotifyStateChanged();
 
         var settings = settingsRepository.Load();
         var profile = settings.Profiles.First(p => p.Id == settings.ActiveProfileId);
@@ -55,6 +64,7 @@ public class RecordingOrchestrator(
             // Phase 6 : gestion d'erreur complète
             _session.CompleteTranscription(string.Empty);
         }
+        NotifyStateChanged();
     }
 
     public void StopRecording() => _cts?.Cancel();
