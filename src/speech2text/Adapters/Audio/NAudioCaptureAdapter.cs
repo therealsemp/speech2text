@@ -4,6 +4,12 @@ using speech2text.Domain.Ports;
 
 namespace speech2text.Adapters.Audio;
 
+/// <summary>
+/// Records audio from the default microphone using the NAudio library (WaveInEvent).
+/// Captures raw PCM at 16 kHz mono — the format recommended by Whisper for optimal transcription quality.
+/// Recording runs until the cancellation token fires, at which point WaveInEvent is stopped gracefully
+/// and the captured PCM is wrapped into a WAV file returned as a byte array.
+/// </summary>
 public class NAudioCaptureAdapter : IAudioCapture
 {
     // 16 kHz mono — format optimal pour Whisper

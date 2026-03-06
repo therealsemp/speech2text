@@ -5,6 +5,21 @@ using speech2text.Domain.Ports;
 
 namespace speech2text.Adapters.Hotkey;
 
+/// <summary>
+/// Implements global hotkey registration using the Win32 <c>RegisterHotKey</c> / <c>UnregisterHotKey</c> API
+/// via the NHotkey.Wpf library.
+///
+/// A global hotkey fires system-wide regardless of which application has focus, unlike WPF's built-in
+/// KeyBinding which only works when the window is in the foreground.
+///
+/// NHotkey.Wpf bridges the gap by using the WPF main window as the receiver of Win32 <c>WM_HOTKEY</c>
+/// messages, translating them into C# events. This requires an active WPF message loop.
+///
+/// Windows-only constraint: RegisterHotKey is a Win32 API, consistent with the overall WPF/Windows stack.
+///
+/// Note: if the requested hotkey is already registered by another application,
+/// NHotkey throws <see cref="HotkeyAlreadyRegisteredException"/> — to be handled in Phase 6.
+/// </summary>
 public class NHotkeyAdapter : IHotkeyRegistration
 {
     public void Register(string hotkey, Action onTriggered)
