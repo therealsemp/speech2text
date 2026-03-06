@@ -9,25 +9,29 @@ namespace speech2text.Adapters.Transcription;
 
 /// <summary>
 /// Transcribes audio using the Azure OpenAI Whisper model via the Azure.AI.OpenAI SDK (v2).
-/// Creates an <see cref="AzureOpenAIClient"/> from the profile's endpoint URL and API key,
-/// obtains an <see cref="OpenAI.Audio.AudioClient"/> for the "whisper" deployment,
-/// and calls TranscribeAudioAsync with the WAV audio data and target language.
-/// A new client is created per call — connection pooling is handled internally by the SDK.
+/// Both <see cref="AzureOpenAIClient"/> and <see cref="AudioClient"/> are initialized once at
+/// construction time and reused across calls — they are thread-safe and manage an internal
+/// HttpClient with connection pooling, so recreating them per call would be wasteful.
 /// </summary>
-public class AzureOpenAITranscriptionAdapter(TranscriptionProfile profile) : ITranscriptionBackend
+public class AzureOpenAITranscriptionAdapter : ITranscriptionBackend
 {
-    public async Task<string> TranscribeAsync(byte[] audioData, string language, CancellationToken ct)
+    private readonly AudioClient _audioClient;
+
+    public AzureOpenAITranscriptionAdapter(TranscriptionProfile profile)
     {
         var client = new AzureOpenAIClient(
             new Uri(profile.EndpointUrl),
             new AzureKeyCredential(profile.ApiKey));
 
-        AudioClient audioClient = client.GetAudioClient("whisper");
+        _audioClient = client.GetAudioClient("whisper");
+    }
 
+    public async Task<string> TranscribeAsync(byte[] audioData, string language, CancellationToken ct)
+    {
         using var audioStream = new MemoryStream(audioData);
         var options = new AudioTranscriptionOptions { Language = language };
 
-        AudioTranscription result = await audioClient.TranscribeAudioAsync(
+        AudioTranscription result = await _audioClient.TranscribeAudioAsync(
             audioStream, "recording.wav", options, ct);
 
         return result.Text;
