@@ -7,5 +7,8 @@
 
 > Consulter ces fichiers avant toute implémentation.
 
+## Stack
+C# 13 / .NET 9 — WPF — self-contained exe
+
 ## Statut du projet
-Phase : **Spécification**
+Phase : **Spécification / Architecture**
