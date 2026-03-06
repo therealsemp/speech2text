@@ -29,6 +29,8 @@ public class OverlayViewModel : ViewModelBase
                 OnPropertyChanged(nameof(IsRecording));
                 OnPropertyChanged(nameof(IsTranscribing));
                 OnPropertyChanged(nameof(StatusText));
+                OnPropertyChanged(nameof(RecordingButtonLabel));
+                ToggleRecordingCommand.RaiseCanExecuteChanged();
             }
         }
     }
@@ -42,6 +44,10 @@ public class OverlayViewModel : ViewModelBase
         RecordingState.Transcribing => "Transcribing...",
         _                           => "Ready"
     };
+
+    public string RecordingButtonLabel => State == RecordingState.Recording
+        ? "Stop Recording"
+        : "Start Recording";
 
     public string ErrorMessage
     {
@@ -75,6 +81,8 @@ public class OverlayViewModel : ViewModelBase
         }
     }
 
+    public RelayCommand ToggleRecordingCommand { get; }
+    public RelayCommand MinimizeCommand { get; }
     public RelayCommand OpenSettingsCommand { get; }
     public RelayCommand CloseCommand { get; }
     public RelayCommand DismissErrorCommand { get; }
@@ -93,8 +101,19 @@ public class OverlayViewModel : ViewModelBase
         _orchestrator.StateChanged += OnOrchestratorStateChanged;
         _orchestrator.ErrorOccurred += OnErrorOccurred;
 
+        ToggleRecordingCommand = new RelayCommand(
+            execute:    () =>
+            {
+                if (_orchestrator.State == RecordingState.Idle)
+                    _ = _orchestrator.StartRecordingAsync();
+                else if (_orchestrator.State == RecordingState.Recording)
+                    _orchestrator.StopRecording();
+            },
+            canExecute: () => _orchestrator.State != RecordingState.Transcribing);
+
+        MinimizeCommand     = new RelayCommand(() => System.Windows.Application.Current.MainWindow!.WindowState = System.Windows.WindowState.Minimized);
         OpenSettingsCommand = new RelayCommand(() => OpenSettingsRequested?.Invoke());
-        CloseCommand = new RelayCommand(() => System.Windows.Application.Current.MainWindow?.Hide());
+        CloseCommand        = new RelayCommand(() => System.Windows.Application.Current.Shutdown());
         DismissErrorCommand = new RelayCommand(() => ErrorMessage = string.Empty);
 
         LoadFromSettings(deviceEnumerator);
