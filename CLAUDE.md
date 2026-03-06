@@ -11,4 +11,5 @@
 C# 13 / .NET 9 — WPF — self-contained exe
 
 ## Statut du projet
-Phase : **Spécification / Architecture**
+Phase : **Prêt pour le développement**
+Prochaine étape : Phase 1 — Bootstrap (voir `docs/roadmap.md`)
