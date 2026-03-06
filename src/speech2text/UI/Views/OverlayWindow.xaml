@@ -29,7 +29,6 @@
             <!-- ── Title bar (draggable) ── -->
             <Border DockPanel.Dock="Top"
                     Background="{DynamicResource PrimaryHueDarkBrush}"
-                    MouseLeftButtonDown="TitleBar_MouseLeftButtonDown"
                     Cursor="SizeAll">
                 <Grid Height="34" Margin="12,0,4,0">
                     <Grid.ColumnDefinitions>
