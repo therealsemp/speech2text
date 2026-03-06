@@ -1,3 +1,3 @@
 namespace speech2text.Domain.Events;
 
-public record TranscriptionCompleted(string Text, DateTimeOffset OccurredAt) : DomainEvent(OccurredAt);
+public record TranscriptionCompletedEvent(string Text, DateTimeOffset OccurredAt) : DomainEvent(OccurredAt);

@@ -32,12 +32,12 @@ public class RecordingSessionTests
     }
 
     [Fact]
-    public void StartRecording_EmitsRecordingStarted()
+    public void StartRecording_EmitsRecordingStartedEvent()
     {
         var session = new RecordingSession();
         session.StartRecording();
         Assert.Single(session.DomainEvents);
-        Assert.IsType<RecordingStarted>(session.DomainEvents[0]);
+        Assert.IsType<RecordingStartedEvent>(session.DomainEvents[0]);
     }
 
     [Fact]
@@ -50,12 +50,12 @@ public class RecordingSessionTests
     }
 
     [Fact]
-    public void StopRecording_EmitsRecordingStopped()
+    public void StopRecording_EmitsRecordingStoppedEvent()
     {
         var session = new RecordingSession();
         session.StartRecording();
         session.StopRecording();
-        Assert.IsType<RecordingStopped>(session.DomainEvents[1]);
+        Assert.IsType<RecordingStoppedEvent>(session.DomainEvents[1]);
     }
 
     [Fact]
@@ -69,13 +69,13 @@ public class RecordingSessionTests
     }
 
     [Fact]
-    public void CompleteTranscription_EmitsTranscriptionCompletedWithText()
+    public void CompleteTranscription_EmitsTranscriptionCompletedEventWithText()
     {
         var session = new RecordingSession();
         session.StartRecording();
         session.StopRecording();
         session.CompleteTranscription("hello world");
-        var evt = Assert.IsType<TranscriptionCompleted>(session.DomainEvents[2]);
+        var evt = Assert.IsType<TranscriptionCompletedEvent>(session.DomainEvents[2]);
         Assert.Equal("hello world", evt.Text);
     }
 
@@ -91,12 +91,12 @@ public class RecordingSessionTests
     }
 
     [Fact]
-    public void Cancel_EmitsRecordingCancelled()
+    public void Cancel_EmitsRecordingCancelledEvent()
     {
         var session = new RecordingSession();
         session.StartRecording();
         session.Cancel();
-        Assert.IsType<RecordingCancelled>(session.DomainEvents[1]);
+        Assert.IsType<RecordingCancelledEvent>(session.DomainEvents[1]);
     }
 
     // --- Invalid transitions ---

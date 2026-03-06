@@ -19,7 +19,7 @@ public class RecordingSession
             throw new InvalidOperationException($"Cannot start recording in state {State}.");
 
         State = RecordingState.Recording;
-        _events.Add(new RecordingStarted(DateTimeOffset.UtcNow));
+        _events.Add(new RecordingStartedEvent(DateTimeOffset.UtcNow));
     }
 
     public void StopRecording()
@@ -28,7 +28,7 @@ public class RecordingSession
             throw new InvalidOperationException($"Cannot stop recording in state {State}.");
 
         State = RecordingState.Transcribing;
-        _events.Add(new RecordingStopped(DateTimeOffset.UtcNow));
+        _events.Add(new RecordingStoppedEvent(DateTimeOffset.UtcNow));
     }
 
     public void Cancel()
@@ -37,7 +37,7 @@ public class RecordingSession
             throw new InvalidOperationException($"Cannot cancel in state {State}.");
 
         State = RecordingState.Idle;
-        _events.Add(new RecordingCancelled(DateTimeOffset.UtcNow));
+        _events.Add(new RecordingCancelledEvent(DateTimeOffset.UtcNow));
     }
 
     public void CompleteTranscription(string text)
@@ -46,6 +46,6 @@ public class RecordingSession
             throw new InvalidOperationException($"Cannot complete transcription in state {State}.");
 
         State = RecordingState.Idle;
-        _events.Add(new TranscriptionCompleted(text, DateTimeOffset.UtcNow));
+        _events.Add(new TranscriptionCompletedEvent(text, DateTimeOffset.UtcNow));
     }
 }

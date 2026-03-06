@@ -1,3 +1,3 @@
 namespace speech2text.Domain.Events;
 
-public record RecordingStopped(DateTimeOffset OccurredAt) : DomainEvent(OccurredAt);
+public record RecordingStoppedEvent(DateTimeOffset OccurredAt) : DomainEvent(OccurredAt);
