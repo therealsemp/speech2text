@@ -10,7 +10,12 @@ public class TranscriptionBackendFactoryTests
     [Fact]
     public void Create_AzureOpenAI_ReturnsAzureOpenAIAdapter()
     {
-        var profile = new TranscriptionProfile { ServiceType = TranscriptionServiceType.AzureOpenAI };
+        var profile = new TranscriptionProfile
+        {
+            ServiceType = TranscriptionServiceType.AzureOpenAI,
+            EndpointUrl = "https://example.openai.azure.com/",
+            ApiKey      = "test-key"
+        };
 
         var backend = _factory.Create(profile);
 
