@@ -53,13 +53,21 @@ public partial class App : System.Windows.Application
         RecordingOrchestrator orchestrator,
         string binding)
     {
-        hotkey.Register(binding, () =>
+        try
         {
-            if (orchestrator.State == RecordingState.Idle)
-                _ = orchestrator.StartRecordingAsync();
-            else if (orchestrator.State == RecordingState.Recording)
-                orchestrator.StopRecording();
-        });
+            hotkey.Register(binding, () =>
+            {
+                if (orchestrator.State == RecordingState.Idle)
+                    _ = orchestrator.StartRecordingAsync();
+                else if (orchestrator.State == RecordingState.Recording)
+                    orchestrator.StopRecording();
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            MessageBox.Show(ex.Message, "Hotkey Registration Failed",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     private static ServiceProvider BuildServices()

@@ -1,4 +1,5 @@
 using System.IO;
+using System.Net.Http;
 using Azure;
 using Azure.AI.OpenAI;
 using OpenAI.Audio;
@@ -13,17 +14,19 @@ namespace speech2text.Adapters.Transcription;
 /// construction time and reused across calls — they are thread-safe and manage an internal
 /// HttpClient with connection pooling, so recreating them per call would be wasteful.
 /// </summary>
-public class AzureOpenAITranscriptionAdapter : ITranscriptionBackend
+public class AzureOpenAITranscriptionAdapter : ITranscriptionBackend, IDisposable
 {
+    private readonly AzureOpenAIClient _client;
     private readonly AudioClient _audioClient;
+    private bool _disposed;
 
     public AzureOpenAITranscriptionAdapter(TranscriptionProfile profile)
     {
-        var client = new AzureOpenAIClient(
+        _client = new AzureOpenAIClient(
             new Uri(profile.EndpointUrl),
             new AzureKeyCredential(profile.ApiKey));
 
-        _audioClient = client.GetAudioClient("whisper");
+        _audioClient = _client.GetAudioClient("whisper");
     }
 
     public async Task<string> TranscribeAsync(byte[] audioData, string language, CancellationToken ct)
@@ -31,9 +34,29 @@ public class AzureOpenAITranscriptionAdapter : ITranscriptionBackend
         using var audioStream = new MemoryStream(audioData);
         var options = new AudioTranscriptionOptions { Language = language };
 
-        AudioTranscription result = await _audioClient.TranscribeAudioAsync(
-            audioStream, "recording.wav", options, ct);
+        try
+        {
+            AudioTranscription result = await _audioClient.TranscribeAudioAsync(
+                audioStream, "recording.wav", options, ct);
 
-        return result.Text;
+            return result.Text;
+        }
+        catch (RequestFailedException ex) when (ex.Status is 401 or 403)
+        {
+            throw new InvalidOperationException(
+                "Transcription failed: invalid API key or unauthorized access. Check your credentials in Settings.", ex);
+        }
+        catch (HttpRequestException ex)
+        {
+            throw new InvalidOperationException(
+                "Transcription failed: network error. Check your internet connection.", ex);
+        }
+    }
+
+    public void Dispose()
+    {
+        if (_disposed) return;
+        _disposed = true;
+        (_client as IDisposable)?.Dispose();
     }
 }

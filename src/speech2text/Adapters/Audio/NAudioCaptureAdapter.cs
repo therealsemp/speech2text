@@ -1,4 +1,5 @@
 using System.IO;
+using NAudio;
 using NAudio.Wave;
 using speech2text.Domain.Ports;
 
@@ -27,7 +28,16 @@ public class NAudioCaptureAdapter : IAudioCapture
 
         ct.Register(() => waveIn.StopRecording());
 
-        waveIn.StartRecording();
+        try
+        {
+            waveIn.StartRecording();
+        }
+        catch (MmException ex)
+        {
+            throw new InvalidOperationException(
+                $"Could not start recording: the audio device may be in exclusive mode or unavailable. ({ex.Result})", ex);
+        }
+
         await stoppedTcs.Task;
 
         return WrapInWav(rawPcm.ToArray(), waveIn.WaveFormat);

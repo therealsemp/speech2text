@@ -9,6 +9,10 @@
         ShowInTaskbar="False"
         KeyDown="Window_KeyDown">
 
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </Window.Resources>
+
     <StackPanel Margin="12" MinWidth="240">
 
         <!-- Status indicator -->
@@ -50,6 +54,32 @@
             <Button Content="Settings" Command="{Binding OpenSettingsCommand}" Padding="8,4" Margin="0,0,4,0"/>
             <Button Content="Close"    Command="{Binding CloseCommand}"        Padding="8,4"/>
         </StackPanel>
+
+        <!-- Error panel -->
+        <Border Background="#FFEBEE" CornerRadius="4" Padding="8,6" Margin="0,8,0,0"
+                Visibility="{Binding HasError, Converter={StaticResource BoolToVis}}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0"
+                           Text="{Binding ErrorMessage}"
+                           TextWrapping="Wrap"
+                           Foreground="#C62828"
+                           FontSize="11"/>
+                <Button Grid.Column="1"
+                        Content="x"
+                        Command="{Binding DismissErrorCommand}"
+                        VerticalAlignment="Top"
+                        Margin="8,0,0,0"
+                        Padding="4,1"
+                        BorderThickness="0"
+                        Background="Transparent"
+                        Foreground="#C62828"
+                        FontWeight="Bold"/>
+            </Grid>
+        </Border>
 
     </StackPanel>
 </Window>

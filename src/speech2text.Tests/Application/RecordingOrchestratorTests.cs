@@ -128,4 +128,50 @@ public class RecordingOrchestratorTests
 
         _textOutput.Verify(x => x.InjectText(It.IsAny<string>()), Times.Never);
     }
+
+    [Fact]
+    public async Task TranscriptionError_FiresErrorOccurred()
+    {
+        var audioTcs = new TaskCompletionSource<byte[]>();
+        _audioCapture.Setup(x => x.RecordAsync(It.IsAny<CancellationToken>())).Returns(audioTcs.Task);
+        _backend.Setup(x => x.TranscribeAsync(It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("Transcription failed: network error."));
+
+        string? capturedError = null;
+        _orchestrator.ErrorOccurred += msg => capturedError = msg;
+
+        var sessionTask = _orchestrator.StartRecordingAsync();
+        audioTcs.SetResult(SampleAudio);
+        await sessionTask;
+
+        Assert.Equal("Transcription failed: network error.", capturedError);
+    }
+
+    // --- Erreur de capture audio ---
+
+    [Fact]
+    public async Task AudioCaptureError_DoesNotThrow_ReturnsToIdle()
+    {
+        _audioCapture.Setup(x => x.RecordAsync(It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("Audio device unavailable."));
+
+        await _orchestrator.StartRecordingAsync(); // ne doit pas throw
+
+        Assert.Equal(RecordingState.Idle, _orchestrator.State);
+    }
+
+    [Fact]
+    public async Task AudioCaptureError_FiresErrorOccurred_AndDoesNotTranscribe()
+    {
+        _audioCapture.Setup(x => x.RecordAsync(It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("Audio device unavailable."));
+
+        string? capturedError = null;
+        _orchestrator.ErrorOccurred += msg => capturedError = msg;
+
+        await _orchestrator.StartRecordingAsync();
+
+        Assert.Equal("Audio device unavailable.", capturedError);
+        _backend.Verify(x => x.TranscribeAsync(It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
 }

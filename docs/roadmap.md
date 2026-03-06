@@ -47,14 +47,14 @@
 - [x] DI container setup in `App.xaml.cs` — wire all ports to adapters
 - [x] Escape key cancels recording (when overlay has focus)
 
-## Phase 6 — Polish & error handling
+## Phase 6 — Polish & error handling ✅
 > Stable and usable
 
-- [ ] Error handling (transcription failure, no microphone, network error)
+- [x] Error handling (transcription failure, no microphone, network error)
   - `NAudioCaptureAdapter`: catch `MmException` on `StartRecording()` — thrown when the device is in exclusive mode (e.g. locked by another app). Convert to a domain-level error and expose it via `RecordingOrchestrator` so the UI can display a meaningful message. Note: shared mode (default) allows concurrent access, so this only affects exclusive-mode drivers.
   - `NHotkeyAdapter`: catch `HotkeyAlreadyRegisteredException` — thrown when the requested hotkey is already registered by another application. Surface to the user with a suggestion to change the binding in settings.
   - `AzureOpenAITranscriptionAdapter`: handle network errors (`HttpRequestException`) and auth failures (401/403) with distinct user-facing messages.
-- [ ] `AzureOpenAITranscriptionAdapter` disposal — the adapter holds an `AzureOpenAIClient` (and its internal `HttpClient`). When the user switches profile, the old adapter is abandoned and the GC eventually collects it, but TCP sockets may linger (socket exhaustion risk). Fix: implement `IDisposable` on the adapter, have `TranscriptionBackendFactory` track and dispose the previous instance before creating a new one.
+- [x] `AzureOpenAITranscriptionAdapter` disposal — implements `IDisposable`; `TranscriptionBackendFactory` tracks and disposes the previous instance before creating a new one.
 
 ## Phase 7 — UI polish
 > Visually finished

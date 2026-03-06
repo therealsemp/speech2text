@@ -18,6 +18,9 @@ public class RecordingOrchestrator(
     /// <summary>Fired on the calling thread after each state transition.</summary>
     public event Action<RecordingState>? StateChanged;
 
+    /// <summary>Fired when a non-cancellation error occurs during recording or transcription.</summary>
+    public event Action<string>? ErrorOccurred;
+
     private void NotifyStateChanged() => StateChanged?.Invoke(_session.State);
 
     public async Task StartRecordingAsync()
@@ -36,6 +39,13 @@ public class RecordingOrchestrator(
         {
             _session.Cancel();
             NotifyStateChanged();
+            return;
+        }
+        catch (Exception ex)
+        {
+            _session.Cancel();
+            NotifyStateChanged();
+            ErrorOccurred?.Invoke(ex.Message);
             return;
         }
 
@@ -59,10 +69,10 @@ public class RecordingOrchestrator(
             textOutput.InjectText(text);
             _session.CompleteTranscription(text);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // Phase 6 : gestion d'erreur complète
             _session.CompleteTranscription(string.Empty);
+            ErrorOccurred?.Invoke(ex.Message);
         }
         NotifyStateChanged();
     }

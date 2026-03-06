@@ -14,6 +14,7 @@ public class OverlayViewModel : ViewModelBase
     private RecordingState _state;
     private TranscriptionProfile? _activeProfile;
     private AudioDevice? _selectedDevice;
+    private string _errorMessage = string.Empty;
 
     public ObservableCollection<TranscriptionProfile> Profiles { get; } = [];
     public ObservableCollection<AudioDevice> AudioDevices { get; } = [];
@@ -42,6 +43,18 @@ public class OverlayViewModel : ViewModelBase
         _                           => "Ready"
     };
 
+    public string ErrorMessage
+    {
+        get => _errorMessage;
+        private set
+        {
+            if (SetField(ref _errorMessage, value))
+                OnPropertyChanged(nameof(HasError));
+        }
+    }
+
+    public bool HasError => !string.IsNullOrEmpty(_errorMessage);
+
     public TranscriptionProfile? ActiveProfile
     {
         get => _activeProfile;
@@ -64,6 +77,7 @@ public class OverlayViewModel : ViewModelBase
 
     public RelayCommand OpenSettingsCommand { get; }
     public RelayCommand CloseCommand { get; }
+    public RelayCommand DismissErrorCommand { get; }
 
     /// <summary>Raised when the user requests to open the settings window.</summary>
     public event Action? OpenSettingsRequested;
@@ -77,16 +91,28 @@ public class OverlayViewModel : ViewModelBase
         _settingsRepository = settingsRepository;
 
         _orchestrator.StateChanged += OnOrchestratorStateChanged;
+        _orchestrator.ErrorOccurred += OnErrorOccurred;
 
         OpenSettingsCommand = new RelayCommand(() => OpenSettingsRequested?.Invoke());
         CloseCommand = new RelayCommand(() => System.Windows.Application.Current.MainWindow?.Hide());
+        DismissErrorCommand = new RelayCommand(() => ErrorMessage = string.Empty);
 
         LoadFromSettings(deviceEnumerator);
     }
 
     private void OnOrchestratorStateChanged(RecordingState state)
     {
-        System.Windows.Application.Current.Dispatcher.Invoke(() => State = state);
+        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        {
+            if (state == RecordingState.Recording)
+                ErrorMessage = string.Empty;
+            State = state;
+        });
+    }
+
+    private void OnErrorOccurred(string message)
+    {
+        System.Windows.Application.Current.Dispatcher.Invoke(() => ErrorMessage = message);
     }
 
     private void LoadFromSettings(IAudioDeviceEnumerator deviceEnumerator)
