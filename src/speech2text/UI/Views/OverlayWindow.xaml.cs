@@ -16,8 +16,9 @@ public partial class OverlayWindow : Window
         _orchestrator = orchestrator;
     }
 
+    private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) => DragMove();
+
     // Escape cancels an in-progress recording when the overlay has focus.
-    // Global Escape (without requiring focus) is planned for Phase 6.
     private void Window_KeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key == Key.Escape)
