@@ -60,7 +60,17 @@ public class RecordingOrchestrator(
         NotifyStateChanged();
 
         var settings = settingsRepository.Load();
-        var profile = settings.Profiles.First(p => p.Id == settings.ActiveProfileId);
+        var profile = settings.Profiles.FirstOrDefault(p => p.Id == settings.ActiveProfileId)
+                      ?? settings.Profiles.FirstOrDefault();
+
+        if (profile == null)
+        {
+            _session.CompleteTranscription(string.Empty);
+            ErrorOccurred?.Invoke("No transcription profile configured. Add a profile in Settings.");
+            NotifyStateChanged();
+            return;
+        }
+
         var backend = backendFactory.Create(profile);
 
         try
