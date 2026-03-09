@@ -36,6 +36,7 @@ public partial class App : System.Windows.Application
         // Re-register hotkey when settings are saved
         settingsVm.SettingsSaved += newSettings =>
         {
+            overlayVm.RefreshProfiles(newSettings);
             hotkey.Unregister(newSettings.HotkeyBinding);
             RegisterToggleHotkey(hotkey, orchestrator, newSettings.HotkeyBinding);
         };

@@ -151,6 +151,17 @@ public class OverlayViewModel : ViewModelBase
                           ?? AudioDevices.FirstOrDefault();
     }
 
+    public void RefreshProfiles(AppSettings settings)
+    {
+        var previousId = _activeProfile?.Id;
+        Profiles.Clear();
+        foreach (var p in settings.Profiles)
+            Profiles.Add(p);
+        _activeProfile = Profiles.FirstOrDefault(p => p.Id == previousId)
+                         ?? Profiles.FirstOrDefault();
+        OnPropertyChanged(nameof(ActiveProfile));
+    }
+
     private void SaveActiveProfile(Guid profileId)
     {
         var settings = _settingsRepository.Load();
