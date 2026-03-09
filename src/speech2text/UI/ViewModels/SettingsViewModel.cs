@@ -31,7 +31,16 @@ public class SettingsViewModel : ViewModelBase
 
     public bool HasSelectedProfile => _selectedProfile != null;
 
-    public string ProfileName        { get => _profileName;        set => SetField(ref _profileName, value); }
+    public string ProfileName
+    {
+        get => _profileName;
+        set
+        {
+            SetField(ref _profileName, value);
+            if (_selectedProfile != null)
+                _selectedProfile.Name = value;
+        }
+    }
     public string ProfileApiKey      { get => _profileApiKey;      set => SetField(ref _profileApiKey, value); }
     public string ProfileEndpointUrl { get => _profileEndpointUrl; set => SetField(ref _profileEndpointUrl, value); }
     public string ProfileLanguage    { get => _profileLanguage;    set => SetField(ref _profileLanguage, value); }
