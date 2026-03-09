@@ -56,7 +56,7 @@
   - `AzureOpenAITranscriptionAdapter`: handle network errors (`HttpRequestException`) and auth failures (401/403) with distinct user-facing messages.
 - [x] `AzureOpenAITranscriptionAdapter` disposal — implements `IDisposable`; `TranscriptionBackendFactory` tracks and disposes the previous instance before creating a new one.
 
-## Phase 7 — UI polish 🚧
+## Phase 7 — UI polish ✅
 > Visually finished
 
 - [x] Adopt MaterialDesignInXamlToolkit (v5, MD3, dark theme, LightBlue/Red)
@@ -64,9 +64,7 @@
 - [x] Recording button — round FAB, icon reflects state (mic / stop / dots), turns red when recording
 - [x] Window draggable via Win32 WM_NCLBUTTONDOWN (reliable on transparent layered windows)
 - [x] Minimize button in title bar; Close button shuts down the app
-- [ ] Fix visual artifacts / halo effect around the FAB recording button
-- [ ] `SettingsWindow` — apply MaterialDesign style to match the overlay
-- [ ] Overall coherence (fonts, button styles, dark/light mode ?)
+- [x] `SettingsWindow` — apply MaterialDesign style to match the overlay
 
 ## Phase 8 — First release
 > Published

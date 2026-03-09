@@ -483,3 +483,6 @@ $RECYCLE.BIN/
 
 # Claude Code local settings
 .claude/settings.local.json
+
+# Infrastructure (Terraform — contient des secrets, non versionné)
+infrastructure/

@@ -25,8 +25,11 @@ public class SettingsViewModel : ViewModelBase
             SetField(ref _selectedProfile, value);
             LoadProfileFields(value);
             DeleteProfileCommand.RaiseCanExecuteChanged();
+            OnPropertyChanged(nameof(HasSelectedProfile));
         }
     }
+
+    public bool HasSelectedProfile => _selectedProfile != null;
 
     public string ProfileName        { get => _profileName;        set => SetField(ref _profileName, value); }
     public string ProfileApiKey      { get => _profileApiKey;      set => SetField(ref _profileApiKey, value); }

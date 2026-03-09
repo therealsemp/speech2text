@@ -17,6 +17,7 @@ public partial class SettingsWindow : Window
     {
         InitializeComponent();
         DataContext = viewModel;
+        viewModel.SettingsSaved += _ => Hide();
     }
 
     protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)

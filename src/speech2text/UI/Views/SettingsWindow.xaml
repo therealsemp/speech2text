@@ -92,31 +92,62 @@
                                Fill="{DynamicResource MaterialDesignDivider}"
                                VerticalAlignment="Stretch"/>
 
-                    <!-- Right: profile form -->
-                    <StackPanel Grid.Column="3">
-                        <TextBlock Text="PROFILE"
-                                   FontSize="10" FontWeight="Medium"
-                                   Opacity="0.45" Margin="0,0,0,14"/>
+                    <!-- Right: profile form or placeholder -->
+                    <Grid Grid.Column="3">
 
-                        <TextBox materialDesign:HintAssist.Hint="Name"
-                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                                 Text="{Binding ProfileName, UpdateSourceTrigger=PropertyChanged}"
-                                 Margin="0,0,0,12"/>
+                        <!-- Placeholder quand aucun profil sélectionné -->
+                        <TextBlock Text="Select or create a profile"
+                                   Opacity="0.35" FontStyle="Italic"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasSelectedProfile}" Value="False">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
 
-                        <TextBox materialDesign:HintAssist.Hint="API Key"
-                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                                 Text="{Binding ProfileApiKey, UpdateSourceTrigger=PropertyChanged}"
-                                 Margin="0,0,0,12"/>
+                        <!-- Formulaire profil -->
+                        <StackPanel>
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasSelectedProfile}" Value="False">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
 
-                        <TextBox materialDesign:HintAssist.Hint="Endpoint URL"
-                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                                 Text="{Binding ProfileEndpointUrl, UpdateSourceTrigger=PropertyChanged}"
-                                 Margin="0,0,0,12"/>
+                            <TextBlock Text="PROFILE"
+                                       FontSize="10" FontWeight="Medium"
+                                       Opacity="0.45" Margin="0,0,0,14"/>
 
-                        <TextBox materialDesign:HintAssist.Hint="Language (e.g. fr, en-US)"
-                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                                 Text="{Binding ProfileLanguage, UpdateSourceTrigger=PropertyChanged}"/>
-                    </StackPanel>
+                            <TextBox materialDesign:HintAssist.Hint="Name"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Text="{Binding ProfileName, UpdateSourceTrigger=PropertyChanged}"
+                                     Margin="0,0,0,12"/>
+
+                            <TextBox materialDesign:HintAssist.Hint="Endpoint URL"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Text="{Binding ProfileEndpointUrl, UpdateSourceTrigger=PropertyChanged}"
+                                     Margin="0,0,0,12"/>
+
+                            <TextBox materialDesign:HintAssist.Hint="API Key"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Text="{Binding ProfileApiKey, UpdateSourceTrigger=PropertyChanged}"
+                                     Margin="0,0,0,12"/>
+
+                            <TextBox materialDesign:HintAssist.Hint="Language (e.g. fr, en-US)"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Text="{Binding ProfileLanguage, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+                    </Grid>
                 </Grid>
 
                 <!-- Bottom: hotkey + save -->
