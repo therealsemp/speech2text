@@ -1,3 +1,4 @@
+using System.ClientModel;
 using System.IO;
 using System.Net.Http;
 using Azure;
@@ -40,6 +41,21 @@ public class AzureOpenAITranscriptionAdapter : ITranscriptionBackend, IDisposabl
                 audioStream, "recording.wav", options, ct);
 
             return result.Text;
+        }
+        catch (ClientResultException ex) when (ex.Status is 401 or 403)
+        {
+            throw new InvalidOperationException(
+                "Transcription failed: invalid API key or unauthorized access. Check your credentials in Settings.", ex);
+        }
+        catch (ClientResultException ex) when (ex.Status is 404)
+        {
+            throw new InvalidOperationException(
+                "Transcription failed: endpoint or deployment not found. Check your endpoint URL in Settings.", ex);
+        }
+        catch (ClientResultException ex)
+        {
+            throw new InvalidOperationException(
+                $"Transcription failed (HTTP {ex.Status}): {ex.Message}", ex);
         }
         catch (RequestFailedException ex) when (ex.Status is 401 or 403)
         {

@@ -9,7 +9,8 @@
       "Bash(\"/c/Program Files/dotnet/dotnet.exe\" build:*)",
       "Bash(\"/c/Program Files/dotnet/dotnet.exe\" add:*)",
       "Bash(\"/c/Program Files/dotnet/dotnet.exe\" test:*)",
-      "Bash(\"/c/Program Files/dotnet/dotnet.exe\" new:*)"
+      "Bash(\"/c/Program Files/dotnet/dotnet.exe\" new:*)",
+      "Bash(cd /d/perso/code/speech2text/src && \"/c/Program Files/dotnet/dotnet.exe\" test --no-build 2>&1 || \"/c/Program Files/dotnet/dotnet.exe\" test 2>&1)"
     ]
   }
 }

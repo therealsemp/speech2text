@@ -147,6 +147,71 @@ public class RecordingOrchestratorTests
         Assert.Equal("Transcription failed: network error.", capturedError);
     }
 
+    // --- Sélection de profil ---
+
+    [Fact]
+    public async Task NoProfiles_FiresErrorAndReturnsToIdle()
+    {
+        var settingsRepo = new Mock<ISettingsRepository>();
+        settingsRepo.Setup(x => x.Load()).Returns(new AppSettings { Profiles = [] });
+
+        var audioCapture = new Mock<IAudioCapture>();
+        audioCapture.Setup(x => x.RecordAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(SampleAudio);
+
+        var orchestrator = new RecordingOrchestrator(
+            audioCapture.Object,
+            new Mock<ITranscriptionBackendFactory>().Object,
+            new Mock<ITextOutput>().Object,
+            settingsRepo.Object);
+
+        string? capturedError = null;
+        orchestrator.ErrorOccurred += msg => capturedError = msg;
+
+        await orchestrator.StartRecordingAsync();
+
+        Assert.Equal(RecordingState.Idle, orchestrator.State);
+        Assert.NotNull(capturedError);
+        Assert.Contains("No transcription profile", capturedError);
+    }
+
+    [Fact]
+    public async Task ActiveProfileIdNotFound_FallsBackToFirstProfile()
+    {
+        var profile = new TranscriptionProfile { Id = Guid.NewGuid(), Language = "fr" };
+        var settings = new AppSettings
+        {
+            ActiveProfileId = Guid.NewGuid(), // ID qui ne correspond à aucun profil
+            Profiles        = [profile]
+        };
+
+        var settingsRepo = new Mock<ISettingsRepository>();
+        settingsRepo.Setup(x => x.Load()).Returns(settings);
+
+        var backend = new Mock<ITranscriptionBackend>();
+        backend.Setup(x => x.TranscribeAsync(It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync("text");
+
+        var backendFactory = new Mock<ITranscriptionBackendFactory>();
+        backendFactory.Setup(x => x.Create(It.IsAny<TranscriptionProfile>())).Returns(backend.Object);
+
+        var audioCapture = new Mock<IAudioCapture>();
+        audioCapture.Setup(x => x.RecordAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(SampleAudio);
+
+        var orchestrator = new RecordingOrchestrator(
+            audioCapture.Object,
+            backendFactory.Object,
+            new Mock<ITextOutput>().Object,
+            settingsRepo.Object);
+
+        await orchestrator.StartRecordingAsync();
+
+        // Doit avoir utilisé le premier profil disponible (language "fr")
+        backend.Verify(x => x.TranscribeAsync(It.IsAny<byte[]>(), "fr", It.IsAny<CancellationToken>()), Times.Once);
+        Assert.Equal(RecordingState.Idle, orchestrator.State);
+    }
+
     // --- Erreur de capture audio ---
 
     [Fact]
