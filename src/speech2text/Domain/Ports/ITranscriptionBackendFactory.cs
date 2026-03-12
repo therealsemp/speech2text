@@ -8,4 +8,10 @@ namespace speech2text.Domain.Ports;
 public interface ITranscriptionBackendFactory
 {
     ITranscriptionBackend Create(TranscriptionProfile profile);
+
+    /// <summary>
+    /// Returns the extra parameter definitions required by the adapter for a given service type.
+    /// Used by the UI to generate form fields dynamically.
+    /// </summary>
+    IReadOnlyList<ExtraParameterDefinition> GetParameterDefinitions(TranscriptionServiceType serviceType);
 }

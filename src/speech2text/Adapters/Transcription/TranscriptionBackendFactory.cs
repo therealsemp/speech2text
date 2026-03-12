@@ -29,6 +29,13 @@ public class TranscriptionBackendFactory : ITranscriptionBackendFactory, IDispos
         return adapter;
     }
 
+    public IReadOnlyList<ExtraParameterDefinition> GetParameterDefinitions(TranscriptionServiceType serviceType) =>
+        serviceType switch
+        {
+            TranscriptionServiceType.AzureOpenAI => AzureOpenAITranscriptionAdapter.ParameterDefinitions,
+            _ => []
+        };
+
     public void Dispose()
     {
         _currentAdapter?.Dispose();

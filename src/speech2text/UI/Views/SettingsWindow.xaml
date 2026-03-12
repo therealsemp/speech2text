@@ -138,11 +138,6 @@
                                      Text="{Binding ProfileEndpointUrl, UpdateSourceTrigger=PropertyChanged}"
                                      Margin="0,0,0,12"/>
 
-                            <TextBox materialDesign:HintAssist.Hint="Deployment name"
-                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                                     Text="{Binding ProfileDeploymentName, UpdateSourceTrigger=PropertyChanged}"
-                                     Margin="0,0,0,12"/>
-
                             <Grid Margin="0,0,0,12">
                                 <PasswordBox x:Name="ApiKeyPasswordBox"
                                              materialDesign:HintAssist.Hint="API Key"
@@ -168,7 +163,19 @@
 
                             <TextBox materialDesign:HintAssist.Hint="Language (e.g. fr, en-US)"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                                     Text="{Binding ProfileLanguage, UpdateSourceTrigger=PropertyChanged}"/>
+                                     Text="{Binding ProfileLanguage, UpdateSourceTrigger=PropertyChanged}"
+                                     Margin="0,0,0,12"/>
+
+                            <ItemsControl ItemsSource="{Binding ProfileExtraParameters}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBox materialDesign:HintAssist.Hint="{Binding Label}"
+                                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                                 Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"
+                                                 Margin="0,0,0,12"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
                         </StackPanel>
                     </Grid>
                 </Grid>

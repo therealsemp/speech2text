@@ -17,6 +17,9 @@ namespace speech2text.Adapters.Transcription;
 /// </summary>
 public class AzureOpenAITranscriptionAdapter : ITranscriptionBackend, IDisposable
 {
+    public static IReadOnlyList<ExtraParameterDefinition> ParameterDefinitions =>
+        [new ExtraParameterDefinition("deploymentName", "Deployment name")];
+
     private readonly AzureOpenAIClient _client;
     private readonly AudioClient _audioClient;
     private bool _disposed;

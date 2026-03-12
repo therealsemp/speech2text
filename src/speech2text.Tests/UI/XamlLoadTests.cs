@@ -25,7 +25,10 @@ public class XamlLoadTests : IClassFixture<WpfApplicationFixture>
         var repo = new Mock<ISettingsRepository>();
         repo.Setup(x => x.Load()).Returns(new AppSettings());
 
-        var vm = new SettingsViewModel(repo.Object);
+        var factory = new Mock<ITranscriptionBackendFactory>();
+        factory.Setup(x => x.GetParameterDefinitions(It.IsAny<TranscriptionServiceType>())).Returns([]);
+
+        var vm = new SettingsViewModel(repo.Object, factory.Object);
         _ = new SettingsWindow(vm);
     }
 

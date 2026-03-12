@@ -57,4 +57,24 @@ public class TranscriptionBackendFactoryTests
 
         Assert.Throws<InvalidOperationException>(() => _factory.Create(profile));
     }
+
+    // --- GetParameterDefinitions ---
+
+    [Fact]
+    public void GetParameterDefinitions_AzureOpenAI_ReturnsDeploymentNameDefinition()
+    {
+        var definitions = _factory.GetParameterDefinitions(TranscriptionServiceType.AzureOpenAI);
+
+        Assert.Single(definitions);
+        Assert.Equal("deploymentName", definitions[0].Key);
+        Assert.False(string.IsNullOrWhiteSpace(definitions[0].Label));
+    }
+
+    [Fact]
+    public void GetParameterDefinitions_UnknownServiceType_ReturnsEmpty()
+    {
+        var definitions = _factory.GetParameterDefinitions((TranscriptionServiceType)999);
+
+        Assert.Empty(definitions);
+    }
 }
