@@ -42,4 +42,14 @@ public partial class SettingsWindow : Window
     }
 
     private void CloseButton_Click(object sender, RoutedEventArgs e) => Close();
+
+    private void RevealApiKey_Click(object sender, RoutedEventArgs e)
+    {
+        var reveal = ApiKeyPasswordBox.Visibility == Visibility.Visible;
+        ApiKeyPasswordBox.Visibility = reveal ? Visibility.Collapsed : Visibility.Visible;
+        ApiKeyTextBox.Visibility     = reveal ? Visibility.Visible   : Visibility.Collapsed;
+        ApiKeyRevealIcon.Kind        = reveal
+            ? MaterialDesignThemes.Wpf.PackIconKind.EyeOff
+            : MaterialDesignThemes.Wpf.PackIconKind.Eye;
+    }
 }

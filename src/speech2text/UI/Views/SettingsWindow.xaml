@@ -143,10 +143,28 @@
                                      Text="{Binding ProfileDeploymentName, UpdateSourceTrigger=PropertyChanged}"
                                      Margin="0,0,0,12"/>
 
-                            <TextBox materialDesign:HintAssist.Hint="API Key"
-                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                                     Text="{Binding ProfileApiKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Margin="0,0,0,12"/>
+                            <Grid Margin="0,0,0,12">
+                                <PasswordBox x:Name="ApiKeyPasswordBox"
+                                             materialDesign:HintAssist.Hint="API Key"
+                                             materialDesign:PasswordBoxAssist.Password="{Binding ProfileApiKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource MaterialDesignOutlinedPasswordBox}"/>
+
+                                <TextBox x:Name="ApiKeyTextBox"
+                                         materialDesign:HintAssist.Hint="API Key"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         Text="{Binding ProfileApiKey, UpdateSourceTrigger=PropertyChanged}"
+                                         Visibility="Collapsed"/>
+
+                                <Button HorizontalAlignment="Right"
+                                        VerticalAlignment="Center"
+                                        Margin="0,0,6,0"
+                                        Style="{StaticResource MaterialDesignIconButton}"
+                                        Width="24" Height="24" Padding="0"
+                                        Click="RevealApiKey_Click"
+                                        ToolTip="Show / hide API key">
+                                    <materialDesign:PackIcon x:Name="ApiKeyRevealIcon" Kind="Eye" Width="14" Height="14"/>
+                                </Button>
+                            </Grid>
 
                             <TextBox materialDesign:HintAssist.Hint="Language (e.g. fr, en-US)"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"
