@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         Title="Settings"
-        Width="580" Height="500"
+        Width="580" Height="540"
         WindowStartupLocation="CenterScreen"
         WindowStyle="None"
         AllowsTransparency="True"
@@ -136,6 +136,12 @@
                             <TextBox materialDesign:HintAssist.Hint="Endpoint URL"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"
                                      Text="{Binding ProfileEndpointUrl, UpdateSourceTrigger=PropertyChanged}"
+                                     Margin="0,0,0,12"/>
+
+                            <TextBox materialDesign:HintAssist.Hint="Deployment name (e.g. whisper)"
+                                     materialDesign:HintAssist.HelperText="Key: deploymentName"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Text="{Binding ProfileDeploymentName, UpdateSourceTrigger=PropertyChanged}"
                                      Margin="0,0,0,12"/>
 
                             <TextBox materialDesign:HintAssist.Hint="API Key"

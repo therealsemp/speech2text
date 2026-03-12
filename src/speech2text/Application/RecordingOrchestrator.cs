@@ -71,10 +71,9 @@ public class RecordingOrchestrator(
             return;
         }
 
-        var backend = backendFactory.Create(profile);
-
         try
         {
+            var backend = backendFactory.Create(profile);
             var text = await backend.TranscribeAsync(audio, profile.Language, CancellationToken.None);
             textOutput.InjectText(text);
             _session.CompleteTranscription(text);

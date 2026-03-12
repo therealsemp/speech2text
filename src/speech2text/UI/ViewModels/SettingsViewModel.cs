@@ -13,6 +13,7 @@ public class SettingsViewModel : ViewModelBase
     private string _profileApiKey = string.Empty;
     private string _profileEndpointUrl = string.Empty;
     private string _profileLanguage = string.Empty;
+    private string _profileDeploymentName = string.Empty;
     private string _hotkeyBinding = string.Empty;
 
     public ObservableCollection<TranscriptionProfile> Profiles { get; } = [];
@@ -41,10 +42,11 @@ public class SettingsViewModel : ViewModelBase
                 _selectedProfile.Name = value;
         }
     }
-    public string ProfileApiKey      { get => _profileApiKey;      set => SetField(ref _profileApiKey, value); }
-    public string ProfileEndpointUrl { get => _profileEndpointUrl; set => SetField(ref _profileEndpointUrl, value); }
-    public string ProfileLanguage    { get => _profileLanguage;    set => SetField(ref _profileLanguage, value); }
-    public string HotkeyBinding      { get => _hotkeyBinding;      set => SetField(ref _hotkeyBinding, value); }
+    public string ProfileApiKey        { get => _profileApiKey;        set => SetField(ref _profileApiKey, value); }
+    public string ProfileEndpointUrl   { get => _profileEndpointUrl;   set => SetField(ref _profileEndpointUrl, value); }
+    public string ProfileLanguage      { get => _profileLanguage;      set => SetField(ref _profileLanguage, value); }
+    public string ProfileDeploymentName { get => _profileDeploymentName; set => SetField(ref _profileDeploymentName, value); }
+    public string HotkeyBinding        { get => _hotkeyBinding;        set => SetField(ref _hotkeyBinding, value); }
 
     public RelayCommand AddProfileCommand    { get; }
     public RelayCommand DeleteProfileCommand { get; }
@@ -72,10 +74,11 @@ public class SettingsViewModel : ViewModelBase
 
     private void LoadProfileFields(TranscriptionProfile? profile)
     {
-        ProfileName        = profile?.Name        ?? string.Empty;
-        ProfileApiKey      = profile?.ApiKey      ?? string.Empty;
-        ProfileEndpointUrl = profile?.EndpointUrl ?? string.Empty;
-        ProfileLanguage    = profile?.Language    ?? string.Empty;
+        ProfileName           = profile?.Name        ?? string.Empty;
+        ProfileApiKey         = profile?.ApiKey      ?? string.Empty;
+        ProfileEndpointUrl    = profile?.EndpointUrl ?? string.Empty;
+        ProfileLanguage       = profile?.Language    ?? string.Empty;
+        ProfileDeploymentName = profile?.ExtraParameters.GetValueOrDefault("deploymentName") ?? string.Empty;
     }
 
     private void AddProfile()
@@ -100,6 +103,10 @@ public class SettingsViewModel : ViewModelBase
             SelectedProfile.ApiKey      = ProfileApiKey;
             SelectedProfile.EndpointUrl = ProfileEndpointUrl;
             SelectedProfile.Language    = ProfileLanguage;
+            if (!string.IsNullOrWhiteSpace(ProfileDeploymentName))
+                SelectedProfile.ExtraParameters["deploymentName"] = ProfileDeploymentName;
+            else
+                SelectedProfile.ExtraParameters.Remove("deploymentName");
         }
 
         var settings = _settingsRepository.Load();

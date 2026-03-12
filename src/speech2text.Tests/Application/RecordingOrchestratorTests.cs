@@ -212,6 +212,42 @@ public class RecordingOrchestratorTests
         Assert.Equal(RecordingState.Idle, orchestrator.State);
     }
 
+    // --- Erreur de création du backend (ex: profil incomplet) ---
+
+    [Fact]
+    public async Task BackendCreationError_DoesNotThrow_ReturnsToIdle()
+    {
+        var audioTcs = new TaskCompletionSource<byte[]>();
+        _audioCapture.Setup(x => x.RecordAsync(It.IsAny<CancellationToken>())).Returns(audioTcs.Task);
+        _backendFactory.Setup(x => x.Create(It.IsAny<TranscriptionProfile>()))
+            .Throws(new InvalidOperationException("Transcription profile is missing the Deployment Name."));
+
+        var sessionTask = _orchestrator.StartRecordingAsync();
+        audioTcs.SetResult(SampleAudio);
+        await sessionTask; // ne doit pas throw
+
+        Assert.Equal(RecordingState.Idle, _orchestrator.State);
+    }
+
+    [Fact]
+    public async Task BackendCreationError_FiresErrorOccurred()
+    {
+        var audioTcs = new TaskCompletionSource<byte[]>();
+        _audioCapture.Setup(x => x.RecordAsync(It.IsAny<CancellationToken>())).Returns(audioTcs.Task);
+        _backendFactory.Setup(x => x.Create(It.IsAny<TranscriptionProfile>()))
+            .Throws(new InvalidOperationException("Transcription profile is missing the Deployment Name."));
+
+        string? capturedError = null;
+        _orchestrator.ErrorOccurred += msg => capturedError = msg;
+
+        var sessionTask = _orchestrator.StartRecordingAsync();
+        audioTcs.SetResult(SampleAudio);
+        await sessionTask;
+
+        Assert.NotNull(capturedError);
+        Assert.Contains("Deployment Name", capturedError);
+    }
+
     // --- Erreur de capture audio ---
 
     [Fact]

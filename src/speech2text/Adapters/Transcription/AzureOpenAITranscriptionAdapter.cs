@@ -23,11 +23,18 @@ public class AzureOpenAITranscriptionAdapter : ITranscriptionBackend, IDisposabl
 
     public AzureOpenAITranscriptionAdapter(TranscriptionProfile profile)
     {
+        if (string.IsNullOrWhiteSpace(profile.EndpointUrl))
+            throw new InvalidOperationException("Transcription profile is missing the Endpoint URL. Check your settings.");
+        if (string.IsNullOrWhiteSpace(profile.ApiKey))
+            throw new InvalidOperationException("Transcription profile is missing the API Key. Check your settings.");
+        if (!profile.ExtraParameters.TryGetValue("deploymentName", out var deploymentName) || string.IsNullOrWhiteSpace(deploymentName))
+            throw new InvalidOperationException("Transcription profile is missing the Deployment Name. Check your settings.");
+
         _client = new AzureOpenAIClient(
             new Uri(profile.EndpointUrl),
             new AzureKeyCredential(profile.ApiKey));
 
-        _audioClient = _client.GetAudioClient("whisper");
+        _audioClient = _client.GetAudioClient(deploymentName);
     }
 
     public async Task<string> TranscribeAsync(byte[] audioData, string language, CancellationToken ct)
