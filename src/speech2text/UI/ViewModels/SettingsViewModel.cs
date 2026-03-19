@@ -14,10 +14,12 @@ public class SettingsViewModel : ViewModelBase
     private string _profileApiKey = string.Empty;
     private string _profileEndpointUrl = string.Empty;
     private string _profileLanguage = string.Empty;
+    private TranscriptionServiceType _selectedServiceType;
     private string _hotkeyBinding = string.Empty;
 
     public ObservableCollection<TranscriptionProfile> Profiles { get; } = [];
     public ObservableCollection<ExtraParameterViewModel> ProfileExtraParameters { get; } = [];
+    public IReadOnlyList<TranscriptionServiceType> ServiceTypes { get; } = Enum.GetValues<TranscriptionServiceType>();
 
     public TranscriptionProfile? SelectedProfile
     {
@@ -47,6 +49,21 @@ public class SettingsViewModel : ViewModelBase
     public string ProfileEndpointUrl { get => _profileEndpointUrl; set => SetField(ref _profileEndpointUrl, value); }
     public string ProfileLanguage    { get => _profileLanguage;    set => SetField(ref _profileLanguage, value); }
     public string HotkeyBinding      { get => _hotkeyBinding;      set => SetField(ref _hotkeyBinding, value); }
+
+    public TranscriptionServiceType SelectedServiceType
+    {
+        get => _selectedServiceType;
+        set
+        {
+            if (!SetField(ref _selectedServiceType, value)) return;
+            if (_selectedProfile == null) return;
+            _selectedProfile.ServiceType = value;
+            _selectedProfile.ExtraParameters.Clear();
+            ProfileExtraParameters.Clear();
+            foreach (var def in _backendFactory.GetParameterDefinitions(value))
+                ProfileExtraParameters.Add(new ExtraParameterViewModel(def.Key, def.Label, string.Empty));
+        }
+    }
 
     public RelayCommand AddProfileCommand    { get; }
     public RelayCommand DeleteProfileCommand { get; }
@@ -79,6 +96,10 @@ public class SettingsViewModel : ViewModelBase
         ProfileApiKey      = profile?.ApiKey      ?? string.Empty;
         ProfileEndpointUrl = profile?.EndpointUrl ?? string.Empty;
         ProfileLanguage    = profile?.Language    ?? string.Empty;
+
+        // Set backing field directly to avoid triggering side effects (ExtraParameters reset)
+        _selectedServiceType = profile?.ServiceType ?? TranscriptionServiceType.AzureOpenAI;
+        OnPropertyChanged(nameof(SelectedServiceType));
 
         ProfileExtraParameters.Clear();
         if (profile == null) return;
