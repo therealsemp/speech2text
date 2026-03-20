@@ -13,7 +13,7 @@ Windows has a built-in dictation feature triggered by `Win+H`. While the concept
 - Minimal floating overlay with quick access to configuration
 - Supports multiple named transcription profiles (e.g. one per language)
 - Configurable audio input device
-- Press `Escape` to cancel a recording without transcribing
+- Press `Escape` during recording to cancel without transcribing; press `Escape` at any other time to minimize to tray
 
 ## Status
 

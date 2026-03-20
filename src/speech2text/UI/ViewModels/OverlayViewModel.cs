@@ -121,9 +121,20 @@ public class OverlayViewModel : ViewModelBase
         LoadFromSettings(deviceEnumerator);
     }
 
+    public void HandleEscapeKey()
+    {
+        if (_orchestrator.State == RecordingState.Recording)
+            _orchestrator.CancelRecording();
+        else
+            MinimizeToTrayRequested?.Invoke();
+    }
+
+    protected virtual void Dispatch(Action action) =>
+        System.Windows.Application.Current.Dispatcher.Invoke(action);
+
     private void OnOrchestratorStateChanged(RecordingState state)
     {
-        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        Dispatch(() =>
         {
             if (state == RecordingState.Recording)
                 ErrorMessage = string.Empty;
@@ -133,7 +144,7 @@ public class OverlayViewModel : ViewModelBase
 
     private void OnErrorOccurred(string message)
     {
-        System.Windows.Application.Current.Dispatcher.Invoke(() => ErrorMessage = message);
+        Dispatch(() => ErrorMessage = message);
     }
 
     private void LoadFromSettings(IAudioDeviceEnumerator deviceEnumerator)

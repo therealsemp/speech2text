@@ -48,7 +48,7 @@ public class XamlLoadTests : IClassFixture<WpfApplicationFixture>
             repo.Object);
 
         var vm = new OverlayViewModel(orchestrator, repo.Object, deviceEnumerator.Object);
-        _ = new OverlayWindow(vm, orchestrator);
+        _ = new OverlayWindow(vm);
     }
 }
 

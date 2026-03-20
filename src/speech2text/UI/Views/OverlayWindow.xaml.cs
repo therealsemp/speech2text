@@ -5,23 +5,22 @@ using System.Windows.Input;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using System.Windows.Interop;
 using System.Windows.Media;
-using speech2text.Application;
 using speech2text.UI.ViewModels;
 
 namespace speech2text.UI.Views;
 
 public partial class OverlayWindow : Window
 {
-    private readonly RecordingOrchestrator _orchestrator;
+    private readonly OverlayViewModel _viewModel;
 
     [DllImport("user32.dll")]
     private static extern IntPtr SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
 
-    public OverlayWindow(OverlayViewModel viewModel, RecordingOrchestrator orchestrator)
+    public OverlayWindow(OverlayViewModel viewModel)
     {
         InitializeComponent();
         DataContext = viewModel;
-        _orchestrator = orchestrator;
+        _viewModel = viewModel;
     }
 
     protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
@@ -52,7 +51,7 @@ public partial class OverlayWindow : Window
     {
         if (e.Key == Key.Escape)
         {
-            _orchestrator.CancelRecording();
+            _viewModel.HandleEscapeKey();
             e.Handled = true;
         }
     }
