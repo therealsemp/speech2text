@@ -1,6 +1,5 @@
 using System.Runtime.InteropServices;
 using System.Windows;
-using System.Windows.Controls.Primitives;
 using ButtonBase = System.Windows.Controls.Primitives.ButtonBase;
 using System.Windows.Input;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;

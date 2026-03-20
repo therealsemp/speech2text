@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Windows;
 using speech2text.Application;
 using speech2text.Domain;
 using speech2text.Domain.Ports;
