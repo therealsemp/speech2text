@@ -70,7 +70,7 @@
 > Everything needed before shipping v0.1.0
 
 - [x] Sélecteur de `ServiceType` dans `SettingsWindow` (ComboBox sur le profil, reconstruit les champs ExtraParameters dynamiquement au changement)
-- [ ] Icône application + look & feel dans la barre des tâches
+- [x] Icône application + look & feel dans la barre des tâches
 - [ ] Icône application + look & feel quand l'application est minimisée (NotifyIcon / fenêtre réduite)
 - [ ] Escape global — enregistrer Escape comme hotkey globale via `NHotkeyAdapter` uniquement pendant l'enregistrement (activer au `StartRecording`, désactiver au retour `Idle`)
 - [ ] Mode "maintien de touche" — nouvelle option dans `AppSettings` (`RecordingMode`: `Toggle` / `Hold`). En mode `Hold`, l'enregistrement démarre au `KeyDown` du raccourci et s'arrête au `KeyUp`. Configurable dans `SettingsWindow`.

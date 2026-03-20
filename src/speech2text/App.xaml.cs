@@ -1,5 +1,7 @@
 using System.Windows;
+using System.Windows.Forms;
 using Microsoft.Extensions.DependencyInjection;
+using MessageBox = System.Windows.MessageBox;
 using speech2text.Adapters.Audio;
 using speech2text.Adapters.Hotkey;
 using speech2text.Adapters.Settings;
@@ -16,6 +18,7 @@ namespace speech2text;
 public partial class App : System.Windows.Application
 {
     private ServiceProvider? _services;
+    private NotifyIcon?      _trayIcon;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -29,6 +32,26 @@ public partial class App : System.Windows.Application
         var hotkey     = _services.GetRequiredService<IHotkeyRegistration>();
         var settingsVm = _services.GetRequiredService<SettingsViewModel>();
         var overlayVm  = _services.GetRequiredService<OverlayViewModel>();
+
+        // System tray icon (WinForms NotifyIcon — reliable cross-framework)
+        var iconStream = GetResourceStream(new Uri("pack://application:,,,/Resources/app.ico"))!.Stream;
+        var contextMenu = new ContextMenuStrip();
+        contextMenu.Items.Add("Open Overlay",  null, (_, _) => { overlay.Show();  overlay.Activate(); });
+        contextMenu.Items.Add("Open Settings", null, (_, _) => { settings.Show(); settings.Activate(); });
+        contextMenu.Items.Add(new ToolStripSeparator());
+        contextMenu.Items.Add("Exit", null, (_, _) => System.Windows.Application.Current.Shutdown());
+
+        _trayIcon = new NotifyIcon
+        {
+            Icon             = new System.Drawing.Icon(iconStream),
+            Text             = "speech2text",
+            ContextMenuStrip = contextMenu,
+            Visible          = true,
+        };
+        _trayIcon.DoubleClick += (_, _) => { overlay.Show(); overlay.Activate(); };
+
+        // Minimize to tray
+        overlayVm.MinimizeToTrayRequested += () => overlay.Hide();
 
         // Open settings window on request from overlay
         overlayVm.OpenSettingsRequested += () => settings.Show();
@@ -97,6 +120,7 @@ public partial class App : System.Windows.Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        _trayIcon?.Dispose();
         _services?.Dispose();
         base.OnExit(e);
     }

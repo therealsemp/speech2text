@@ -90,6 +90,9 @@ public class OverlayViewModel : ViewModelBase
     /// <summary>Raised when the user requests to open the settings window.</summary>
     public event Action? OpenSettingsRequested;
 
+    /// <summary>Raised when the user clicks the minimize button — the window should hide to tray.</summary>
+    public event Action? MinimizeToTrayRequested;
+
     public OverlayViewModel(
         RecordingOrchestrator orchestrator,
         ISettingsRepository settingsRepository,
@@ -111,7 +114,7 @@ public class OverlayViewModel : ViewModelBase
             },
             canExecute: () => _orchestrator.State != RecordingState.Transcribing);
 
-        MinimizeCommand     = new RelayCommand(() => System.Windows.Application.Current.MainWindow!.WindowState = System.Windows.WindowState.Minimized);
+        MinimizeCommand     = new RelayCommand(() => MinimizeToTrayRequested?.Invoke());
         OpenSettingsCommand = new RelayCommand(() => OpenSettingsRequested?.Invoke());
         CloseCommand        = new RelayCommand(() => System.Windows.Application.Current.Shutdown());
         DismissErrorCommand = new RelayCommand(() => ErrorMessage = string.Empty);
