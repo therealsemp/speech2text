@@ -72,11 +72,7 @@
 - [x] Sélecteur de `ServiceType` dans `SettingsWindow` (ComboBox sur le profil, reconstruit les champs ExtraParameters dynamiquement au changement)
 - [x] Icône application + look & feel dans la barre des tâches
 - [x] Icône application + look & feel quand l'application est minimisée (NotifyIcon / fenêtre réduite)
-- [ ] Escape global — enregistrer Escape comme hotkey globale via `NHotkeyAdapter` uniquement pendant l'enregistrement (activer au `StartRecording`, désactiver au retour `Idle`)
-- [ ] Mode "maintien de touche" — nouvelle option dans `AppSettings` (`RecordingMode`: `Toggle` / `Hold`). En mode `Hold`, l'enregistrement démarre au `KeyDown` du raccourci et s'arrête au `KeyUp`. Configurable dans `SettingsWindow`.
-- [ ] Animation des icônes — pendant l'enregistrement : animation pulsante sur le bouton mic (ex. halo rouge animé). Pendant la transcription : spinner ou animation sur l'icône dots. Implémenter via des animations XAML (`Storyboard` / `DoubleAnimation`) déclenchées par les états du `OverlayViewModel`.
-- [ ] Mode de sortie du texte — nouvelle option dans `AppSettings` (`TextOutputMode`: `InjectAtCursor` / `Clipboard` / `Both`). `InjectAtCursor` : comportement actuel via `SendInputTextAdapter`. `Clipboard` : copie dans le presse-papier sans injection. `Both` : les deux. Configurable dans `SettingsWindow`.
-- [ ] Mettre à jour la documentation utilisateur (`docs/specs.md` ou `README`) : modes d'enregistrement, configuration des profils, ExtraParameters, mode de sortie
+- [x] Escape global — enregistrer Escape comme hotkey globale via `NHotkeyAdapter` uniquement pendant l'enregistrement (activer au `StartRecording`, désactiver au retour `Idle`)
 
 ## Phase 9 — First release
 > Published
@@ -85,7 +81,7 @@
 - [ ] First release: `v0.1.0`
 
 ## Backlog (post v0.1.0)
-- Default profile created on first launch (prompts for Azure credentials)
-- Additional transcription backends (OpenAI direct, local Whisper, Google Speech...)
-- Auto-start with Windows
-- Transcription history
+- [ ] Mode "maintien de touche" — nouvelle option dans `AppSettings` (`RecordingMode`: `Toggle` / `Hold`). En mode `Hold`, l'enregistrement démarre au `KeyDown` du raccourci et s'arrête au `KeyUp`. Configurable dans `SettingsWindow`.
+- [ ] Animation des icônes — pendant l'enregistrement : animation pulsante sur le bouton mic (ex. halo rouge animé). Pendant la transcription : spinner ou animation sur l'icône dots. Implémenter via des animations XAML (`Storyboard` / `DoubleAnimation`) déclenchées par les états du `OverlayViewModel`.
+- [ ] Mode de sortie du texte — nouvelle option dans `AppSettings` (`TextOutputMode`: `InjectAtCursor` / `Clipboard` / `Both`). `InjectAtCursor` : comportement actuel via `SendInputTextAdapter`. `Clipboard` : copie dans le presse-papier sans injection. `Both` : les deux. Configurable dans `SettingsWindow`.
+- [ ] Mettre à jour la documentation utilisateur (`docs/specs.md` ou `README`) : modes d'enregistrement, configuration des profils, ExtraParameters, mode de sortie

@@ -17,4 +17,4 @@ Windows has a built-in dictation feature triggered by `Win+H`. While the concept
 
 ## Status
 
-Work in progress — specifications phase.
+Current version is working (great). See remaining improvements to be implemented befoe release in the RoadMap file.
