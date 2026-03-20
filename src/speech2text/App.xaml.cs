@@ -34,7 +34,9 @@ public partial class App : System.Windows.Application
         var overlayVm  = _services.GetRequiredService<OverlayViewModel>();
 
         // System tray icon (WinForms NotifyIcon — reliable cross-framework)
-        var iconStream = GetResourceStream(new Uri("pack://application:,,,/Resources/app.ico"))!.Stream;
+        var pngStream = GetResourceStream(new Uri("pack://application:,,,/Resources/icon.png"))!.Stream;
+        using var bitmap = new System.Drawing.Bitmap(pngStream);
+        var trayGdiIcon = System.Drawing.Icon.FromHandle(bitmap.GetHicon());
         var contextMenu = new ContextMenuStrip();
         contextMenu.Items.Add("Open Overlay",  null, (_, _) => { overlay.Show();  overlay.Activate(); });
         contextMenu.Items.Add("Open Settings", null, (_, _) => { settings.Show(); settings.Activate(); });
@@ -43,7 +45,7 @@ public partial class App : System.Windows.Application
 
         _trayIcon = new NotifyIcon
         {
-            Icon             = new System.Drawing.Icon(iconStream),
+            Icon             = trayGdiIcon,
             Text             = "speech2text",
             ContextMenuStrip = contextMenu,
             Visible          = true,
