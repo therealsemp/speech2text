@@ -71,6 +71,14 @@ public class RecordingOrchestrator(
             return;
         }
 
+        if (audio.Length == 0)
+        {
+            _session.CompleteTranscription(string.Empty);
+            ErrorOccurred?.Invoke("No audio was captured. Your microphone may be muted or disconnected.");
+            NotifyStateChanged();
+            return;
+        }
+
         try
         {
             var backend = backendFactory.Create(profile);

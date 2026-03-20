@@ -275,4 +275,23 @@ public class RecordingOrchestratorTests
         Assert.Equal("Audio device unavailable.", capturedError);
         _backend.Verify(x => x.TranscribeAsync(It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
     }
+
+    // --- Micro muet / buffer vide ---
+
+    [Fact]
+    public async Task EmptyAudio_FiresMicrophoneError_DoesNotTranscribe()
+    {
+        _audioCapture.Setup(x => x.RecordAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        string? capturedError = null;
+        _orchestrator.ErrorOccurred += msg => capturedError = msg;
+
+        await _orchestrator.StartRecordingAsync();
+
+        Assert.NotNull(capturedError);
+        Assert.Contains("muted or disconnected", capturedError);
+        _backend.Verify(x => x.TranscribeAsync(It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+        Assert.Equal(RecordingState.Idle, _orchestrator.State);
+    }
 }
