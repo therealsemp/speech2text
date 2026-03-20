@@ -71,9 +71,5 @@ public class WpfApplicationFixture
         {
             Source = new Uri("pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml")
         });
-        app.Resources.MergedDictionaries.Add(new ResourceDictionary
-        {
-            Source = new Uri("pack://application:,,,/speech2text;component/UI/Resources/Icons.xaml")
-        });
     }
 }
