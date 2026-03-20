@@ -1,0 +1,150 @@
+using System.Collections.ObjectModel;
+using speech2text.Domain;
+using speech2text.Domain.Ports;
+
+namespace speech2text.UI.ViewModels;
+
+public class SettingsViewModel : ViewModelBase
+{
+    private readonly ISettingsRepository _settingsRepository;
+    private readonly ITranscriptionBackendFactory _backendFactory;
+
+    private TranscriptionProfile? _selectedProfile;
+    private string _profileName = string.Empty;
+    private string _profileApiKey = string.Empty;
+    private string _profileEndpointUrl = string.Empty;
+    private string _profileLanguage = string.Empty;
+    private TranscriptionServiceType _selectedServiceType;
+    private string _hotkeyBinding = string.Empty;
+
+    public ObservableCollection<TranscriptionProfile> Profiles { get; } = [];
+    public ObservableCollection<ExtraParameterViewModel> ProfileExtraParameters { get; } = [];
+    public IReadOnlyList<TranscriptionServiceType> ServiceTypes { get; } = Enum.GetValues<TranscriptionServiceType>();
+
+    public TranscriptionProfile? SelectedProfile
+    {
+        get => _selectedProfile;
+        set
+        {
+            SetField(ref _selectedProfile, value);
+            LoadProfileFields(value);
+            DeleteProfileCommand.RaiseCanExecuteChanged();
+            OnPropertyChanged(nameof(HasSelectedProfile));
+        }
+    }
+
+    public bool HasSelectedProfile => _selectedProfile != null;
+
+    public string ProfileName
+    {
+        get => _profileName;
+        set
+        {
+            SetField(ref _profileName, value);
+            if (_selectedProfile != null)
+                _selectedProfile.Name = value;
+        }
+    }
+    public string ProfileApiKey      { get => _profileApiKey;      set => SetField(ref _profileApiKey, value); }
+    public string ProfileEndpointUrl { get => _profileEndpointUrl; set => SetField(ref _profileEndpointUrl, value); }
+    public string ProfileLanguage    { get => _profileLanguage;    set => SetField(ref _profileLanguage, value); }
+    public string HotkeyBinding      { get => _hotkeyBinding;      set => SetField(ref _hotkeyBinding, value); }
+
+    public TranscriptionServiceType SelectedServiceType
+    {
+        get => _selectedServiceType;
+        set
+        {
+            if (!SetField(ref _selectedServiceType, value)) return;
+            if (_selectedProfile == null) return;
+            _selectedProfile.ServiceType = value;
+            _selectedProfile.ExtraParameters.Clear();
+            ProfileExtraParameters.Clear();
+            foreach (var def in _backendFactory.GetParameterDefinitions(value))
+                ProfileExtraParameters.Add(new ExtraParameterViewModel(def.Key, def.Label, string.Empty));
+        }
+    }
+
+    public RelayCommand AddProfileCommand    { get; }
+    public RelayCommand DeleteProfileCommand { get; }
+    public RelayCommand SaveCommand          { get; }
+
+    /// <summary>Raised after settings are saved, carrying the updated AppSettings.</summary>
+    public event Action<AppSettings>? SettingsSaved;
+
+    public SettingsViewModel(ISettingsRepository settingsRepository, ITranscriptionBackendFactory backendFactory)
+    {
+        _settingsRepository = settingsRepository;
+        _backendFactory     = backendFactory;
+
+        AddProfileCommand    = new RelayCommand(AddProfile);
+        DeleteProfileCommand = new RelayCommand(DeleteProfile, () => SelectedProfile != null);
+        SaveCommand          = new RelayCommand(Save);
+
+        var settings = _settingsRepository.Load();
+        HotkeyBinding = settings.HotkeyBinding;
+
+        foreach (var p in settings.Profiles)
+            Profiles.Add(p);
+
+        SelectedProfile = Profiles.FirstOrDefault();
+    }
+
+    private void LoadProfileFields(TranscriptionProfile? profile)
+    {
+        ProfileName        = profile?.Name        ?? string.Empty;
+        ProfileApiKey      = profile?.ApiKey      ?? string.Empty;
+        ProfileEndpointUrl = profile?.EndpointUrl ?? string.Empty;
+        ProfileLanguage    = profile?.Language    ?? string.Empty;
+
+        // Set backing field directly to avoid triggering side effects (ExtraParameters reset)
+        _selectedServiceType = profile?.ServiceType ?? TranscriptionServiceType.AzureOpenAI;
+        OnPropertyChanged(nameof(SelectedServiceType));
+
+        ProfileExtraParameters.Clear();
+        if (profile == null) return;
+
+        foreach (var def in _backendFactory.GetParameterDefinitions(profile.ServiceType))
+        {
+            var current = profile.ExtraParameters.GetValueOrDefault(def.Key, string.Empty);
+            ProfileExtraParameters.Add(new ExtraParameterViewModel(def.Key, def.Label, current));
+        }
+    }
+
+    private void AddProfile()
+    {
+        var profile = new TranscriptionProfile { Name = "New Profile" };
+        Profiles.Add(profile);
+        SelectedProfile = profile;
+    }
+
+    private void DeleteProfile()
+    {
+        if (SelectedProfile == null) return;
+        Profiles.Remove(SelectedProfile);
+        SelectedProfile = Profiles.FirstOrDefault();
+    }
+
+    private void Save()
+    {
+        if (SelectedProfile != null)
+        {
+            SelectedProfile.Name        = ProfileName;
+            SelectedProfile.ApiKey      = ProfileApiKey;
+            SelectedProfile.EndpointUrl = ProfileEndpointUrl;
+            SelectedProfile.Language    = ProfileLanguage;
+
+            SelectedProfile.ExtraParameters.Clear();
+            foreach (var param in ProfileExtraParameters)
+                if (!string.IsNullOrWhiteSpace(param.Value))
+                    SelectedProfile.ExtraParameters[param.Key] = param.Value;
+        }
+
+        var settings = _settingsRepository.Load();
+        settings.HotkeyBinding = HotkeyBinding;
+        settings.Profiles      = [.. Profiles];
+        _settingsRepository.Save(settings);
+
+        SettingsSaved?.Invoke(settings);
+    }
+}

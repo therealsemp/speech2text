@@ -1,0 +1,219 @@
+<Window x:Class="speech2text.UI.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="Settings"
+        Icon="pack://application:,,,/speech2text;component/Resources/icon.png"
+        Width="580" Height="540"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontFamily="{DynamicResource MaterialDesignFont}">
+
+    <Border CornerRadius="10" ClipToBounds="True"
+            Background="{DynamicResource MaterialDesignPaper}">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="28" ShadowDepth="6" Direction="270" Opacity="0.5" Color="Black"/>
+        </Border.Effect>
+
+        <DockPanel>
+
+            <!-- ── Title bar (draggable) ── -->
+            <Border DockPanel.Dock="Top"
+                    Background="{DynamicResource PrimaryHueDarkBrush}"
+                    Cursor="SizeAll">
+                <Grid Height="34" Margin="12,0,4,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                               Text="Settings"
+                               Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}"
+                               FontWeight="Medium" FontSize="12"
+                               VerticalAlignment="Center"/>
+
+                    <Button Grid.Column="1"
+                            Click="CloseButton_Click"
+                            Style="{StaticResource MaterialDesignIconForegroundButton}"
+                            Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}"
+                            Width="30" Height="34" Padding="0">
+                        <materialDesign:PackIcon Kind="Close" Width="14" Height="14"/>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- ── Content ── -->
+            <Grid Margin="16,14,16,14">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Profile list + form -->
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="160"/>
+                        <ColumnDefinition Width="1"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Left: profile list -->
+                    <DockPanel Grid.Column="0">
+                        <TextBlock DockPanel.Dock="Top"
+                                   Text="PROFILES"
+                                   FontSize="10" FontWeight="Medium"
+                                   Opacity="0.45" Margin="0,0,0,8"/>
+                        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,8,0,0">
+                            <Button Command="{Binding AddProfileCommand}"
+                                    Style="{StaticResource MaterialDesignIconButton}"
+                                    Width="32" Height="32" Padding="0" Margin="0,0,4,0"
+                                    ToolTip="Add profile">
+                                <materialDesign:PackIcon Kind="Plus" Width="16" Height="16"/>
+                            </Button>
+                            <Button Command="{Binding DeleteProfileCommand}"
+                                    Style="{StaticResource MaterialDesignIconButton}"
+                                    Width="32" Height="32" Padding="0"
+                                    ToolTip="Delete profile">
+                                <materialDesign:PackIcon Kind="Delete" Width="16" Height="16"/>
+                            </Button>
+                        </StackPanel>
+                        <ListBox ItemsSource="{Binding Profiles}"
+                                 SelectedItem="{Binding SelectedProfile}"
+                                 DisplayMemberPath="Name"/>
+                    </DockPanel>
+
+                    <!-- Divider -->
+                    <Rectangle Grid.Column="1"
+                               Fill="{DynamicResource MaterialDesignDivider}"
+                               VerticalAlignment="Stretch"/>
+
+                    <!-- Right: profile form or placeholder -->
+                    <Grid Grid.Column="3">
+
+                        <!-- Placeholder quand aucun profil sélectionné -->
+                        <TextBlock Text="Select or create a profile"
+                                   Opacity="0.35" FontStyle="Italic"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasSelectedProfile}" Value="False">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+
+                        <!-- Formulaire profil -->
+                        <StackPanel>
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasSelectedProfile}" Value="False">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+
+                            <TextBlock Text="PROFILE"
+                                       FontSize="10" FontWeight="Medium"
+                                       Opacity="0.45" Margin="0,0,0,14"/>
+
+                            <TextBox materialDesign:HintAssist.Hint="Name"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Text="{Binding ProfileName, UpdateSourceTrigger=PropertyChanged}"
+                                     Margin="0,0,0,12"/>
+
+                            <ComboBox materialDesign:HintAssist.Hint="Service type"
+                                      Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                      ItemsSource="{Binding ServiceTypes}"
+                                      SelectedItem="{Binding SelectedServiceType}"
+                                      Margin="0,0,0,12"/>
+
+                            <TextBox materialDesign:HintAssist.Hint="Endpoint URL"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Text="{Binding ProfileEndpointUrl, UpdateSourceTrigger=PropertyChanged}"
+                                     Margin="0,0,0,12"/>
+
+                            <Grid Margin="0,0,0,12">
+                                <PasswordBox x:Name="ApiKeyPasswordBox"
+                                             materialDesign:HintAssist.Hint="API Key"
+                                             materialDesign:PasswordBoxAssist.Password="{Binding ProfileApiKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource MaterialDesignOutlinedPasswordBox}"/>
+
+                                <TextBox x:Name="ApiKeyTextBox"
+                                         materialDesign:HintAssist.Hint="API Key"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         Text="{Binding ProfileApiKey, UpdateSourceTrigger=PropertyChanged}"
+                                         Visibility="Collapsed"/>
+
+                                <Button HorizontalAlignment="Right"
+                                        VerticalAlignment="Center"
+                                        Margin="0,0,6,0"
+                                        Style="{StaticResource MaterialDesignIconButton}"
+                                        Width="24" Height="24" Padding="0"
+                                        Click="RevealApiKey_Click"
+                                        ToolTip="Show / hide API key">
+                                    <materialDesign:PackIcon x:Name="ApiKeyRevealIcon" Kind="Eye" Width="14" Height="14"/>
+                                </Button>
+                            </Grid>
+
+                            <TextBox materialDesign:HintAssist.Hint="Language (e.g. fr, en-US)"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Text="{Binding ProfileLanguage, UpdateSourceTrigger=PropertyChanged}"
+                                     Margin="0,0,0,12"/>
+
+                            <ItemsControl ItemsSource="{Binding ProfileExtraParameters}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBox materialDesign:HintAssist.Hint="{Binding Label}"
+                                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                                 Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"
+                                                 Margin="0,0,0,12"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+
+                <!-- Bottom: hotkey + save -->
+                <Grid Grid.Row="1" Margin="0,14,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <materialDesign:PackIcon Kind="Keyboard"
+                                                 Width="16" Height="16"
+                                                 VerticalAlignment="Center"
+                                                 Margin="0,0,8,0"
+                                                 Opacity="0.55"/>
+                        <TextBox materialDesign:HintAssist.Hint="Global hotkey"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 Text="{Binding HotkeyBinding, UpdateSourceTrigger=PropertyChanged}"
+                                 Width="160"/>
+                    </StackPanel>
+
+                    <Button Grid.Column="1"
+                            Content="SAVE"
+                            Command="{Binding SaveCommand}"
+                            Style="{StaticResource MaterialDesignRaisedButton}"
+                            Padding="24,0"/>
+                </Grid>
+            </Grid>
+
+        </DockPanel>
+    </Border>
+</Window>
