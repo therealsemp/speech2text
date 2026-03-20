@@ -108,4 +108,27 @@ public class OverlayViewModelTests
         transcribeTcs.SetResult("text");
         await sessionTask;
     }
+
+    // --- Show overlay on recording start ---
+
+    [Fact]
+    public async Task StartRecording_RaisesShowOverlayRequested()
+    {
+        _audioCapture.Setup(x => x.RecordAsync(It.IsAny<CancellationToken>()))
+            .Returns<CancellationToken>(async ct =>
+            {
+                await Task.Delay(Timeout.Infinite, ct);
+                return [];
+            });
+
+        bool showRaised = false;
+        _vm.ShowOverlayRequested += () => showRaised = true;
+
+        var sessionTask = _orchestrator.StartRecordingAsync();
+        Assert.True(showRaised);
+
+        // Clean up
+        _orchestrator.CancelRecording();
+        await sessionTask;
+    }
 }

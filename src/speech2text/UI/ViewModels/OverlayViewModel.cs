@@ -92,6 +92,9 @@ public class OverlayViewModel : ViewModelBase
     /// <summary>Raised when the user clicks the minimize button — the window should hide to tray.</summary>
     public event Action? MinimizeToTrayRequested;
 
+    /// <summary>Raised when a recording starts while the overlay is hidden — the window should become visible.</summary>
+    public event Action? ShowOverlayRequested;
+
     public OverlayViewModel(
         RecordingOrchestrator orchestrator,
         ISettingsRepository settingsRepository,
@@ -137,7 +140,10 @@ public class OverlayViewModel : ViewModelBase
         Dispatch(() =>
         {
             if (state == RecordingState.Recording)
+            {
                 ErrorMessage = string.Empty;
+                ShowOverlayRequested?.Invoke();
+            }
             State = state;
         });
     }

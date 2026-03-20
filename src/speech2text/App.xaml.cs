@@ -52,8 +52,9 @@ public partial class App : System.Windows.Application
         };
         _trayIcon.DoubleClick += (_, _) => { overlay.Show(); overlay.Activate(); };
 
-        // Minimize to tray
+        // Minimize to tray / restore from tray
         overlayVm.MinimizeToTrayRequested += () => overlay.Hide();
+        overlayVm.ShowOverlayRequested    += () => { overlay.ShowActivated = false; overlay.Show(); overlay.ShowActivated = true; };
 
         // Open settings window on request from overlay
         overlayVm.OpenSettingsRequested += () => settings.Show();
