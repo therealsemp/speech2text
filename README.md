@@ -15,6 +15,19 @@ Windows has a built-in dictation feature triggered by `Win+H`. While the concept
 - Configurable audio input device
 - Press `Escape` during recording to cancel without transcribing; press `Escape` at any other time to minimize to tray
 
+## Installation
+
+Download the latest `speech2text.exe` from the [Releases](../../releases) page and place it anywhere on your machine. No installer required — the app is self-contained.
+
+### Launch at Windows startup
+
+The app does not yet have a built-in "launch at startup" option. In the meantime, you can set it up manually using the Windows Startup folder:
+
+1. Press `Win + R`, type `shell:startup` and press Enter — this opens your personal Startup folder
+2. Create a shortcut to `speech2text.exe` in that folder (right-click → New → Shortcut)
+
+The app will now launch automatically every time you log in. To disable it, delete the shortcut from that folder, or go to **Settings → Apps → Startup** and toggle it off.
+
 ## Status
 
-Current version is working (great). See remaining improvements to be implemented befoe release in the RoadMap file.
+Current version is basic but works great. See remaining improvements to be implemented for the next releases in the RoadMap file.
