@@ -25,6 +25,7 @@ public class OverlayViewModelTests
     private readonly Mock<ITranscriptionBackend> _backend = new();
     private readonly Mock<ITranscriptionBackendFactory> _backendFactory = new();
     private readonly Mock<ITextOutput> _textOutput = new();
+    private readonly Mock<ITextOutputFactory> _textOutputFactory = new();
     private readonly Mock<ISettingsRepository> _settingsRepository = new();
     private readonly Mock<IAudioDeviceEnumerator> _deviceEnumerator = new();
     private readonly RecordingOrchestrator _orchestrator;
@@ -38,11 +39,12 @@ public class OverlayViewModelTests
         _settingsRepository.Setup(x => x.Load()).Returns(settings);
         _backendFactory.Setup(x => x.Create(It.IsAny<TranscriptionProfile>())).Returns(_backend.Object);
         _deviceEnumerator.Setup(x => x.GetDevices()).Returns([]);
+        _textOutputFactory.Setup(x => x.Create(It.IsAny<TextInsertionMode>())).Returns(_textOutput.Object);
 
         _orchestrator = new RecordingOrchestrator(
             _audioCapture.Object,
             _backendFactory.Object,
-            _textOutput.Object,
+            _textOutputFactory.Object,
             _settingsRepository.Object);
 
         _vm = new TestableOverlayViewModel(_orchestrator, _settingsRepository.Object, _deviceEnumerator.Object);

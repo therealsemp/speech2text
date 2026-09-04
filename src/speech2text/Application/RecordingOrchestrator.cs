@@ -6,7 +6,7 @@ namespace speech2text.Application;
 public class RecordingOrchestrator(
     IAudioCapture audioCapture,
     ITranscriptionBackendFactory backendFactory,
-    ITextOutput textOutput,
+    ITextOutputFactory textOutputFactory,
     ISettingsRepository settingsRepository)
 {
     private readonly RecordingSession _session = new();
@@ -83,7 +83,7 @@ public class RecordingOrchestrator(
         {
             var backend = backendFactory.Create(profile);
             var text = await backend.TranscribeAsync(audio, profile.Language, CancellationToken.None);
-            textOutput.InjectText(text);
+            textOutputFactory.Create(settings.TextInsertionMode).InjectText(text);
             _session.CompleteTranscription(text);
         }
         catch (Exception ex)

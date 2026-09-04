@@ -11,6 +11,7 @@ public class RecordingOrchestratorTests
     private readonly Mock<ITranscriptionBackend> _backend = new();
     private readonly Mock<ITranscriptionBackendFactory> _backendFactory = new();
     private readonly Mock<ITextOutput> _textOutput = new();
+    private readonly Mock<ITextOutputFactory> _textOutputFactory = new();
     private readonly Mock<ISettingsRepository> _settingsRepository = new();
     private readonly RecordingOrchestrator _orchestrator;
 
@@ -25,11 +26,12 @@ public class RecordingOrchestratorTests
         _backendFactory.Setup(x => x.Create(It.IsAny<TranscriptionProfile>())).Returns(_backend.Object);
         _backend.Setup(x => x.TranscribeAsync(It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync("transcribed text");
+        _textOutputFactory.Setup(x => x.Create(It.IsAny<TextInsertionMode>())).Returns(_textOutput.Object);
 
         _orchestrator = new RecordingOrchestrator(
             _audioCapture.Object,
             _backendFactory.Object,
-            _textOutput.Object,
+            _textOutputFactory.Object,
             _settingsRepository.Object);
     }
 
@@ -162,7 +164,7 @@ public class RecordingOrchestratorTests
         var orchestrator = new RecordingOrchestrator(
             audioCapture.Object,
             new Mock<ITranscriptionBackendFactory>().Object,
-            new Mock<ITextOutput>().Object,
+            new Mock<ITextOutputFactory>().Object,
             settingsRepo.Object);
 
         string? capturedError = null;
@@ -202,7 +204,7 @@ public class RecordingOrchestratorTests
         var orchestrator = new RecordingOrchestrator(
             audioCapture.Object,
             backendFactory.Object,
-            new Mock<ITextOutput>().Object,
+            new Mock<ITextOutputFactory>().Object,
             settingsRepo.Object);
 
         await orchestrator.StartRecordingAsync();
@@ -274,6 +276,45 @@ public class RecordingOrchestratorTests
 
         Assert.Equal("Audio device unavailable.", capturedError);
         _backend.Verify(x => x.TranscribeAsync(It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    // --- Mode d'insertion de texte ---
+
+    [Fact]
+    public async Task NormalFlow_UsesTextInsertionModeFromSettings()
+    {
+        var profile = new TranscriptionProfile { Id = Guid.NewGuid(), Language = "en-US" };
+        var settings = new AppSettings
+        {
+            ActiveProfileId   = profile.Id,
+            Profiles          = [profile],
+            TextInsertionMode = TextInsertionMode.ClipboardPaste
+        };
+
+        var settingsRepo = new Mock<ISettingsRepository>();
+        settingsRepo.Setup(x => x.Load()).Returns(settings);
+
+        var backend = new Mock<ITranscriptionBackend>();
+        backend.Setup(x => x.TranscribeAsync(It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync("text");
+
+        var backendFactory = new Mock<ITranscriptionBackendFactory>();
+        backendFactory.Setup(x => x.Create(It.IsAny<TranscriptionProfile>())).Returns(backend.Object);
+
+        var textOutputFactory = new Mock<ITextOutputFactory>();
+
+        var audioCapture = new Mock<IAudioCapture>();
+        audioCapture.Setup(x => x.RecordAsync(It.IsAny<CancellationToken>())).ReturnsAsync(SampleAudio);
+
+        var orchestrator = new RecordingOrchestrator(
+            audioCapture.Object,
+            backendFactory.Object,
+            textOutputFactory.Object,
+            settingsRepo.Object);
+
+        await orchestrator.StartRecordingAsync();
+
+        textOutputFactory.Verify(x => x.Create(TextInsertionMode.ClipboardPaste), Times.Once);
     }
 
     // --- Micro muet / buffer vide ---
