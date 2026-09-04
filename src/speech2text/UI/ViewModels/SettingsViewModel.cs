@@ -21,7 +21,6 @@ public class SettingsViewModel : ViewModelBase
     public ObservableCollection<TranscriptionProfile> Profiles { get; } = [];
     public ObservableCollection<ExtraParameterViewModel> ProfileExtraParameters { get; } = [];
     public IReadOnlyList<TranscriptionServiceType> ServiceTypes { get; } = Enum.GetValues<TranscriptionServiceType>();
-    public IReadOnlyList<TextInsertionMode> TextInsertionModes { get; } = Enum.GetValues<TextInsertionMode>();
 
     public TranscriptionProfile? SelectedProfile
     {
@@ -55,7 +54,24 @@ public class SettingsViewModel : ViewModelBase
     public TextInsertionMode SelectedTextInsertionMode
     {
         get => _selectedTextInsertionMode;
-        set => SetField(ref _selectedTextInsertionMode, value);
+        set
+        {
+            if (!SetField(ref _selectedTextInsertionMode, value)) return;
+            OnPropertyChanged(nameof(IsSendInputModeSelected));
+            OnPropertyChanged(nameof(IsClipboardPasteModeSelected));
+        }
+    }
+
+    public bool IsSendInputModeSelected
+    {
+        get => SelectedTextInsertionMode == TextInsertionMode.SendInput;
+        set { if (value) SelectedTextInsertionMode = TextInsertionMode.SendInput; }
+    }
+
+    public bool IsClipboardPasteModeSelected
+    {
+        get => SelectedTextInsertionMode == TextInsertionMode.ClipboardPaste;
+        set { if (value) SelectedTextInsertionMode = TextInsertionMode.ClipboardPaste; }
     }
 
     public TranscriptionServiceType SelectedServiceType
