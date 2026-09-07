@@ -4,7 +4,7 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         Title="Settings"
         Icon="pack://application:,,,/speech2text;component/Resources/icon.png"
-        Width="580" Height="540"
+        Width="580" Height="700"
         WindowStartupLocation="CenterScreen"
         WindowStyle="None"
         AllowsTransparency="True"
@@ -51,6 +51,8 @@
             <Grid Margin="16,14,16,14">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
@@ -187,14 +189,19 @@
                     </Grid>
                 </Grid>
 
-                <!-- Bottom: hotkey + save -->
-                <Grid Grid.Row="1" Margin="0,14,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+                <!-- Divider -->
+                <Rectangle Grid.Row="1"
+                           Fill="{DynamicResource MaterialDesignDivider}"
+                           Height="1"
+                           Margin="0,14,0,0"/>
 
-                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                <!-- General: hotkey + text insertion mode -->
+                <StackPanel Grid.Row="2" Margin="0,14,0,0">
+                    <TextBlock Text="GENERAL"
+                               FontSize="10" FontWeight="Medium"
+                               Opacity="0.45" Margin="0,0,0,12"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
                         <materialDesign:PackIcon Kind="Keyboard"
                                                  Width="16" Height="16"
                                                  VerticalAlignment="Center"
@@ -203,15 +210,43 @@
                         <TextBox materialDesign:HintAssist.Hint="Global hotkey"
                                  Style="{StaticResource MaterialDesignOutlinedTextBox}"
                                  Text="{Binding HotkeyBinding, UpdateSourceTrigger=PropertyChanged}"
-                                 Width="160"/>
+                                 Width="200"/>
                     </StackPanel>
 
-                    <Button Grid.Column="1"
-                            Content="SAVE"
-                            Command="{Binding SaveCommand}"
-                            Style="{StaticResource MaterialDesignRaisedButton}"
-                            Padding="24,0"/>
-                </Grid>
+                    <TextBlock Text="TEXT INSERTION"
+                               FontSize="10" FontWeight="Medium"
+                               Opacity="0.45" Margin="0,0,0,10"/>
+
+                    <RadioButton GroupName="TextInsertionMode"
+                                 IsChecked="{Binding IsSendInputModeSelected}"
+                                 VerticalContentAlignment="Top"
+                                 Margin="0,0,0,12">
+                        <StackPanel Margin="8,-2,0,0">
+                            <TextBlock Text="Type text" FontWeight="Medium"/>
+                            <TextBlock Text="Simulates typing the transcribed text, character by character. Works in every application."
+                                       Opacity="0.6" FontSize="11" TextWrapping="Wrap" MaxWidth="440"/>
+                        </StackPanel>
+                    </RadioButton>
+
+                    <RadioButton GroupName="TextInsertionMode"
+                                 IsChecked="{Binding IsClipboardPasteModeSelected}"
+                                 VerticalContentAlignment="Top">
+                        <StackPanel Margin="8,-2,0,0">
+                            <TextBlock Text="Paste text" FontWeight="Medium"/>
+                            <TextBlock Text="Copies the transcribed text and pastes it in one action. Faster for long text, but replaces your clipboard content."
+                                       Opacity="0.6" FontSize="11" TextWrapping="Wrap" MaxWidth="440"/>
+                        </StackPanel>
+                    </RadioButton>
+                </StackPanel>
+
+                <!-- Save -->
+                <Button Grid.Row="3"
+                        HorizontalAlignment="Right"
+                        Margin="0,16,0,0"
+                        Content="SAVE"
+                        Command="{Binding SaveCommand}"
+                        Style="{StaticResource MaterialDesignRaisedButton}"
+                        Padding="24,0"/>
             </Grid>
 
         </DockPanel>
