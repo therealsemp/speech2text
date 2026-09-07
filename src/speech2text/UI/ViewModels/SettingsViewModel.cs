@@ -16,6 +16,7 @@ public class SettingsViewModel : ViewModelBase
     private string _profileLanguage = string.Empty;
     private TranscriptionServiceType _selectedServiceType;
     private string _hotkeyBinding = string.Empty;
+    private TextInsertionMode _selectedTextInsertionMode;
 
     public ObservableCollection<TranscriptionProfile> Profiles { get; } = [];
     public ObservableCollection<ExtraParameterViewModel> ProfileExtraParameters { get; } = [];
@@ -50,6 +51,29 @@ public class SettingsViewModel : ViewModelBase
     public string ProfileLanguage    { get => _profileLanguage;    set => SetField(ref _profileLanguage, value); }
     public string HotkeyBinding      { get => _hotkeyBinding;      set => SetField(ref _hotkeyBinding, value); }
 
+    public TextInsertionMode SelectedTextInsertionMode
+    {
+        get => _selectedTextInsertionMode;
+        set
+        {
+            if (!SetField(ref _selectedTextInsertionMode, value)) return;
+            OnPropertyChanged(nameof(IsSendInputModeSelected));
+            OnPropertyChanged(nameof(IsClipboardPasteModeSelected));
+        }
+    }
+
+    public bool IsSendInputModeSelected
+    {
+        get => SelectedTextInsertionMode == TextInsertionMode.SendInput;
+        set { if (value) SelectedTextInsertionMode = TextInsertionMode.SendInput; }
+    }
+
+    public bool IsClipboardPasteModeSelected
+    {
+        get => SelectedTextInsertionMode == TextInsertionMode.ClipboardPaste;
+        set { if (value) SelectedTextInsertionMode = TextInsertionMode.ClipboardPaste; }
+    }
+
     public TranscriptionServiceType SelectedServiceType
     {
         get => _selectedServiceType;
@@ -83,6 +107,7 @@ public class SettingsViewModel : ViewModelBase
 
         var settings = _settingsRepository.Load();
         HotkeyBinding = settings.HotkeyBinding;
+        SelectedTextInsertionMode = settings.TextInsertionMode;
 
         foreach (var p in settings.Profiles)
             Profiles.Add(p);
@@ -141,8 +166,9 @@ public class SettingsViewModel : ViewModelBase
         }
 
         var settings = _settingsRepository.Load();
-        settings.HotkeyBinding = HotkeyBinding;
-        settings.Profiles      = [.. Profiles];
+        settings.HotkeyBinding      = HotkeyBinding;
+        settings.TextInsertionMode  = SelectedTextInsertionMode;
+        settings.Profiles           = [.. Profiles];
         _settingsRepository.Save(settings);
 
         SettingsSaved?.Invoke(settings);

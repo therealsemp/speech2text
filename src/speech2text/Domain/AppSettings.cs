@@ -18,6 +18,9 @@ public class AppSettings
     /// <summary>Global hotkey that toggles recording. Defaults to Ctrl+Shift+R.</summary>
     public string HotkeyBinding { get; set; } = "Ctrl+Shift+R";
 
+    /// <summary>How transcribed text is inserted at the cursor. Defaults to SendInput.</summary>
+    public TextInsertionMode TextInsertionMode { get; set; } = TextInsertionMode.SendInput;
+
     /// <summary>All configured transcription profiles. At least one is expected at runtime.</summary>
     public List<TranscriptionProfile> Profiles { get; set; } = [];
 }

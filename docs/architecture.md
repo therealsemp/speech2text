@@ -68,6 +68,11 @@ public interface ITextOutput
     void InjectText(string text);
 }
 
+public interface ITextOutputFactory
+{
+    ITextOutput Create(TextInsertionMode mode);
+}
+
 public interface ISettingsRepository
 {
     AppSettings Load();
@@ -107,6 +112,37 @@ public class TranscriptionBackendFactory : ITranscriptionBackendFactory
 }
 ```
 
+## Text output factory
+
+`AppSettings` carries a `TextInsertionMode` enum value (`SendInput` or `ClipboardPaste`).
+The factory reads it and instantiates the correct adapter. Only one implementation runs per insertion;
+the mode can be changed at any time from Settings and takes effect on the next transcription.
+Adding a new insertion mode = add an enum value + a switch case + an adapter class. Nothing else changes.
+
+```csharp
+public enum TextInsertionMode
+{
+    SendInput,
+    ClipboardPaste
+}
+
+public class TextOutputFactory : ITextOutputFactory
+{
+    public ITextOutput Create(TextInsertionMode mode)
+    {
+        return mode switch
+        {
+            TextInsertionMode.SendInput      => new SendInputTextAdapter(),
+            TextInsertionMode.ClipboardPaste => new ClipboardPasteTextAdapter(),
+            _ => throw new NotSupportedException($"Unsupported text insertion mode: {mode}")
+        };
+    }
+}
+```
+
+Note: `ClipboardPasteTextAdapter` does not restore the previous clipboard content after pasting —
+the transcribed text is left on the clipboard (deliberate simplicity trade-off).
+
 ---
 
 ## Adapters
@@ -123,6 +159,8 @@ public class TranscriptionBackendFactory : ITranscriptionBackendFactory
 | `NAudioCaptureAdapter` | `IAudioCapture` | NAudio |
 | `AzureOpenAITranscriptionAdapter` | `ITranscriptionBackend` | Azure.AI.OpenAI |
 | `SendInputTextAdapter` | `ITextOutput` | InputSimulatorStandard |
+| `ClipboardPasteTextAdapter` | `ITextOutput` | WPF Clipboard + InputSimulatorStandard |
+| `TextOutputFactory` | `ITextOutputFactory` | — |
 | `JsonSettingsRepository` | `ISettingsRepository` | System.Text.Json |
 | `NHotkeyAdapter` | `IHotkeyRegistration` | NHotkey.Wpf |
 
@@ -137,6 +175,7 @@ speech2text/
     TranscriptionProfile.cs       # Entity — named service configuration
     AppSettings.cs                # Entity — global app settings
     AudioDevice.cs                # Value object
+    TextInsertionMode.cs          # Enum — SendInput | ClipboardPaste
     Events/
       RecordingStarted.cs
       RecordingStopped.cs
@@ -147,6 +186,7 @@ speech2text/
       ITranscriptionBackendFactory.cs
       IAudioCapture.cs
       ITextOutput.cs
+      ITextOutputFactory.cs
       ISettingsRepository.cs
       IHotkeyRegistration.cs
   Application/
@@ -159,6 +199,8 @@ speech2text/
       AzureOpenAITranscriptionAdapter.cs
     TextOutput/
       SendInputTextAdapter.cs
+      ClipboardPasteTextAdapter.cs
+      TextOutputFactory.cs
     Settings/
       JsonSettingsRepository.cs
     Hotkey/
@@ -187,7 +229,7 @@ speech2text/
 |---|---|
 | Domain (`RecordingSession`, models) | Pure unit tests — no mocks needed, zero external dependencies |
 | Application (`RecordingOrchestrator`) | Unit tests with mocked ports (`IAudioCapture`, `ITranscriptionBackend`, etc.) |
-| Factory (`TranscriptionBackendFactory`) | Unit tests — verify correct adapter is instantiated per service type |
+| Factories (`TranscriptionBackendFactory`, `TextOutputFactory`) | Unit tests — verify correct adapter is instantiated per service type / insertion mode |
 | Adapters (NAudio, Azure, etc.) | Not unit tested — covered by integration/manual tests |
 
 ### Test project structure
@@ -201,6 +243,7 @@ speech2text.Tests/
     RecordingOrchestratorTests.cs
   Adapters/
     TranscriptionBackendFactoryTests.cs
+    TextOutputFactoryTests.cs
 ```
 
 ---

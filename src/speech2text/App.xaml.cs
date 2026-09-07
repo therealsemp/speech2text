@@ -105,7 +105,7 @@ public partial class App : System.Windows.Application
         services.AddSingleton<IAudioCapture,          NAudioCaptureAdapter>();
         services.AddSingleton<IAudioDeviceEnumerator, NAudioDeviceEnumerator>();
         services.AddSingleton<ITranscriptionBackendFactory, TranscriptionBackendFactory>();
-        services.AddSingleton<ITextOutput,            SendInputTextAdapter>();
+        services.AddSingleton<ITextOutputFactory,     TextOutputFactory>();
         services.AddSingleton<ISettingsRepository,    JsonSettingsRepository>();
         services.AddSingleton<IHotkeyRegistration,    NHotkeyAdapter>();
 

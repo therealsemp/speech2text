@@ -44,7 +44,7 @@ public class XamlLoadTests : IClassFixture<WpfApplicationFixture>
         var orchestrator = new RecordingOrchestrator(
             new Mock<IAudioCapture>().Object,
             new Mock<ITranscriptionBackendFactory>().Object,
-            new Mock<ITextOutput>().Object,
+            new Mock<ITextOutputFactory>().Object,
             repo.Object);
 
         var vm = new OverlayViewModel(orchestrator, repo.Object, deviceEnumerator.Object);
